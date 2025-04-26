@@ -3,7 +3,7 @@
     <!-- Hero Section -->
     <section class="hero">
       <div class="hero-content">
-        <h1>Welcome to Smiling Dental Clinic</h1>
+        <h1>Welcome to Smiling Dental</h1>
         <p class="subtitle">Your trusted partner in dental care and beautiful smiles</p>
         <router-link to="/appointment" class="cta-button">Book an Appointment</router-link>
       </div>
@@ -40,9 +40,9 @@
     <section class="about">
       <div class="about-content">
         <div class="about-text">
-          <h2>About Smiling Dental Clinic</h2>
+          <h2>About Smiling Dental</h2>
           <p>
-            At Smiling Dental Clinic, we believe that everyone deserves a healthy, beautiful smile.
+            At Smiling Dental, we believe that everyone deserves a healthy, beautiful smile.
             Our team of experienced dental professionals is committed to providing personalized,
             gentle care in a comfortable environment.
           </p>
@@ -64,7 +64,7 @@
       <div class="testimonials-grid">
         <div class="testimonial-card">
           <p class="quote">
-            "The team at Smiling Dental Clinic made me feel comfortable from the moment I walked in.
+            "The team at Smiling Dental made me feel comfortable from the moment I walked in.
             My smile has never looked better!"
           </p>
           <p class="author">- Sarah Johnson</p>

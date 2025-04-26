@@ -19,8 +19,8 @@ function logout() {
     <el-header class="custom-header">
       <div class="header-content">
         <router-link to="/" class="logo-link">
-          <img src="@/assets/dental.png" alt="Smiling Dental Clinic Logo" class="logo-img" />
-          <span class="clinic-name">Smiling Dental Clinic</span>
+          <img src="@/assets/dental.png" alt="Smiling Dental" class="logo-img" />
+          <span class="clinic-name">Smiling Dental</span>
         </router-link>
         <nav class="nav-links">
           <router-link to="/appointment" class="nav-link" active-class="active-link"

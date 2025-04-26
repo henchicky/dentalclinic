@@ -61,6 +61,7 @@
 import { reactive } from 'vue'
 import { User } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import axios from 'axios'
 
 interface AppointmentForm {
   patientName: string
@@ -83,7 +84,7 @@ const disabledDate = (time: Date) => {
   return time.getTime() < endOfToday.getTime()
 }
 
-const submitAppointment = () => {
+const submitAppointment = async () => {
   if (
     !appointmentForm.patientName ||
     !appointmentForm.appointmentDate ||
@@ -99,15 +100,17 @@ const submitAppointment = () => {
   appointmentDateTime.setHours(hours)
   appointmentDateTime.setMinutes(minutes)
 
-  // TODO: Add API call to backend
-  console.log('Submitting appointment:', {
-    patientName: appointmentForm.patientName,
-    appointmentTime: appointmentDateTime,
-    description: appointmentForm.description,
-  })
-
-  ElMessage.success('Appointment scheduled successfully!')
-  resetForm()
+  try {
+    await axios.post('http://localhost:8080/api/appointments', {
+      patientName: appointmentForm.patientName,
+      appointmentTime: appointmentDateTime,
+      description: appointmentForm.description,
+    })
+    ElMessage.success('Appointment scheduled successfully!')
+    resetForm()
+  } catch (error) {
+    ElMessage.error('Failed to schedule appointment!')
+  }
 }
 
 const resetForm = () => {
@@ -117,6 +120,7 @@ const resetForm = () => {
   appointmentForm.description = ''
 }
 
+//TODO: get available time options from db
 const timeOptions = {
   start: '09:00',
   end: '17:00',
