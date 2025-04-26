@@ -65,7 +65,7 @@ import { ElMessage } from 'element-plus'
 interface AppointmentForm {
   patientName: string
   appointmentDate: Date | null
-  appointmentTime: Date | null
+  appointmentTime: string | null
   description: string
 }
 
@@ -95,10 +95,9 @@ const submitAppointment = () => {
 
   // Combine date and time
   const appointmentDateTime = new Date(appointmentForm.appointmentDate)
-  const time = appointmentForm.appointmentTime
-  console.log(time)
-  appointmentDateTime.setHours(time.getHours())
-  appointmentDateTime.setMinutes(time.getMinutes())
+  const [hours, minutes] = appointmentForm.appointmentTime.split(':').map(Number)
+  appointmentDateTime.setHours(hours)
+  appointmentDateTime.setMinutes(minutes)
 
   // TODO: Add API call to backend
   console.log('Submitting appointment:', {
