@@ -4,7 +4,7 @@
       <el-card class="box-card">
         <template #header>
           <div class="card-header">
-            <span>Schedule New Appointment</span>
+            <span>Schedule Appointment</span>
           </div>
         </template>
         
@@ -24,19 +24,16 @@
                   v-model="appointmentForm.appointmentDate"
                   type="date"
                   placeholder="Select date"
-                  :shortcuts="dateShortcuts"
                   :disabled-date="disabledDate"
                   @change="handleDateChange"
                   style="width: 200px"
                 />
               </el-col>
               <el-col :span="12">
-                <el-time-picker
+                <el-time-select
                   v-model="appointmentForm.appointmentTime"
                   placeholder="Select time"
-                  format="HH:mm"
-                  :disabled-hours="disabledHours"
-                  :disabled-minutes="disabledMinutes"
+                  :picker-options="timeOptions"
                   style="width: 200px"
                 />
               </el-col>
@@ -80,24 +77,11 @@ const appointmentForm = reactive<AppointmentForm>({
   description: ''
 })
 
-const dateShortcuts = [
-  {
-    text: 'Today',
-    value: new Date(),
-  },
-  {
-    text: 'Tomorrow',
-    value: () => {
-      const date = new Date()
-      date.setTime(date.getTime() + 3600 * 1000 * 24)
-      return date
-    },
-  },
-]
-
 // Disable past dates
 const disabledDate = (time: Date) => {
-  return time.getTime() < Date.now() - 8.64e7
+  const endOfToday = new Date()
+  endOfToday.setHours(23, 59, 59, 999)
+  return time.getTime() < endOfToday.getTime()
 }
 
 // Disable hours outside business hours (9 AM - 5 PM)
@@ -120,11 +104,6 @@ const disabledMinutes = (hour: number) => {
     }
   }
   return minutes
-}
-
-// Disable seconds selection
-const disabledSeconds = () => {
-  return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59]
 }
 
 const handleDateChange = (date: Date) => {
@@ -170,6 +149,12 @@ const resetForm = () => {
   appointmentForm.appointmentDate = null
   appointmentForm.appointmentTime = null
   appointmentForm.description = ''
+}
+
+const timeOptions = {
+  start: '09:00',
+  end: '17:00',
+  step: '00:30',
 }
 </script>
 
