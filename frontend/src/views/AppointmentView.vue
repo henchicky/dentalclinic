@@ -175,8 +175,8 @@ const resetForm = () => {
 
 <style scoped>
 .appointment-form-bg {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #e3f0ff 0%, #f8f9fa 100%);
+  background: transparent;
+  height: 91vh;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -11,10 +11,10 @@ import HelloWorld from './components/HelloWorld.vue'
           <img src="@/assets/dental.png" alt="Smiling Dental Clinic Logo" class="logo-img" />
           <span class="clinic-name">Smiling Dental Clinic</span>
         </router-link>
-        <el-menu mode="horizontal" :router="true" class="custom-menu">
-          <el-menu-item index="/appointment">Appointment</el-menu-item>
-          <el-menu-item index="/schedule">Schedule</el-menu-item>
-        </el-menu>
+        <nav class="nav-links">
+          <router-link to="/appointment" class="nav-link" active-class="active-link">Appointment</router-link>
+          <router-link to="/schedule" class="nav-link" active-class="active-link">Schedule</router-link>
+        </nav>
       </div>
     </el-header>
     
@@ -87,23 +87,27 @@ import HelloWorld from './components/HelloWorld.vue'
   letter-spacing: 1px;
 }
 
-.custom-menu {
-  flex: 1;
-  justify-content: flex-end;
-  background: transparent;
-  border-bottom: none;
+.nav-links {
+  display: flex;
+  gap: 2rem;
 }
 
-.el-menu--horizontal > .el-menu-item {
-  font-size: 1rem;
-  padding: 0 24px;
+.nav-link {
   color: #333;
+  font-size: 1rem;
+  text-decoration: none;
+  font-weight: 500;
   transition: color 0.2s;
+  padding: 0 4px;
+  position: relative;
 }
 
-.el-menu--horizontal > .el-menu-item:hover,
-.el-menu--horizontal > .el-menu-item.is-active {
+.nav-link:hover,
+.active-link {
   color: #4a90e2;
-  background: #f5f7fa;
+}
+
+.active-link::after {
+  color: #4a90e2;
 }
 </style>

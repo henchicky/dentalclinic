@@ -9,15 +9,13 @@ export const useAuthStore = defineStore('auth', () => {
     // TODO: Replace with actual API call
     return new Promise((resolve, reject) => {
       // Simulate API call
-      setTimeout(() => {
-        if (username === 'admin' && password === 'admin') {
-          isAuthenticated.value = true
-          user.value = username
-          resolve(true)
-        } else {
-          reject(new Error('Invalid credentials'))
-        }
-      }, 1000)
+      if (username === 'admin' && password === 'admin') {
+        isAuthenticated.value = true
+        user.value = username
+        resolve(true)
+      } else {
+        reject(new Error('Invalid credentials'))
+      }
     })
   }
 

@@ -1,5 +1,7 @@
 :root {
   font-family: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  /* background: linear-gradient(135deg, #e3f0ff 0%, #f8f9fa 100%); */
+  background: #f0f6fc;
 }
 
 body {

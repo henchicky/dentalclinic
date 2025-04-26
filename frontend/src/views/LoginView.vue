@@ -2,34 +2,38 @@
   <div class="login-container">
     <div class="login-box">
       <h2>Login</h2>
-      <form @submit.prevent="handleLogin">
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input
+      <el-form @submit.prevent="handleLogin" :model="{ username, password }" label-position="top">
+        <el-form-item label="Username" prop="username">
+          <el-input
             id="username"
             v-model="username"
-            type="text"
-            required
             placeholder="Enter your username"
+            prefix-icon="User"
+            autocomplete="username"
+            clearable
           />
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
+        </el-form-item>
+        <el-form-item label="Password" prop="password">
+          <el-input
             id="password"
             v-model="password"
             type="password"
-            required
             placeholder="Enter your password"
+            prefix-icon="Lock"
+            autocomplete="current-password"
+            show-password
+            clearable
           />
-        </div>
+        </el-form-item>
         <div v-if="error" class="error-message">
           {{ error }}
         </div>
-        <button type="submit" :disabled="loading">
-          {{ loading ? 'Logging in...' : 'Login' }}
-        </button>
-      </form>
+        <el-form-item>
+          <el-button type="primary" native-type="submit" :loading="loading" style="width: 100%">
+            {{ loading ? 'Logging in...' : 'Login' }}
+          </el-button>
+        </el-form-item>
+      </el-form>
     </div>
   </div>
 </template>
@@ -65,8 +69,8 @@ const handleLogin = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-color: #f5f5f5;
+  min-height: 91vh;
+  background-color: transparent;
 }
 
 .login-box {
@@ -75,57 +79,13 @@ const handleLogin = async () => {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
 }
 
 h2 {
   text-align: center;
   margin-bottom: 1.5rem;
   color: #333;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #666;
-}
-
-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-input:focus {
-  outline: none;
-  border-color: #4a90e2;
-}
-
-button {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #4a90e2;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-button:hover {
-  background-color: #357abd;
-}
-
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
 }
 
 .error-message {
