@@ -10,7 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
     // TODO: Replace with actual API call
     return new Promise((resolve, reject) => {
       // Simulate API call
-      if (username === 'admin' && password === 'admin') {
+      if (password === 'password') {
         isAuthenticated.value = true
         user.value = username
         // Persist to localStorage
