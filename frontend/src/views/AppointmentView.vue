@@ -18,14 +18,14 @@
           </el-form-item>
 
           <el-form-item label="Appointment" required>
-            <el-row :gutter="20">
-              <el-col :span="12">
+            <el-row style="width: 100%">
+              <el-col :span="12" style="padding-right: 10px;">
                 <el-date-picker
                   v-model="appointmentForm.appointmentDate"
                   type="date"
                   placeholder="Select date"
                   :disabled-date="disabledDate"
-                  style="width: 200px"
+                  style="width: 100%"
                 />
               </el-col>
               <el-col :span="12">
@@ -33,7 +33,7 @@
                   v-model="appointmentForm.appointmentTime"
                   placeholder="Select time"
                   :picker-options="timeOptions"
-                  style="width: 200px"
+                  style="width: 100%"
                 />
               </el-col>
             </el-row>
