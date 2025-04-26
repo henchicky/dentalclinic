@@ -35,11 +35,9 @@ public class AppointmentService {
                 .orElseThrow(() -> new RuntimeException("Appointment not found with id: " + id));
         
         appointment.setPatientName(appointmentDetails.getPatientName());
-        appointment.setDentistName(appointmentDetails.getDentistName());
         appointment.setAppointmentTime(appointmentDetails.getAppointmentTime());
         appointment.setDescription(appointmentDetails.getDescription());
-        appointment.setStatus(appointmentDetails.getStatus());
-        
+
         return appointmentRepository.save(appointment);
     }
 

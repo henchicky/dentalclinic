@@ -15,18 +15,11 @@ public class Appointment {
     private String patientName;
     
     @Column(nullable = false)
-    private String dentistName;
-    
-    @Column(nullable = false)
     private LocalDateTime appointmentTime;
     
     @Column
     private String description;
     
-    @Column
-    private String status; // e.g., "SCHEDULED", "COMPLETED", "CANCELLED"
-
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -43,14 +36,6 @@ public class Appointment {
         this.patientName = patientName;
     }
 
-    public String getDentistName() {
-        return dentistName;
-    }
-
-    public void setDentistName(String dentistName) {
-        this.dentistName = dentistName;
-    }
-
     public LocalDateTime getAppointmentTime() {
         return appointmentTime;
     }
@@ -65,13 +50,5 @@ public class Appointment {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 } 
