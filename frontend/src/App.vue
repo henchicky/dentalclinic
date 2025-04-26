@@ -1,6 +1,18 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink, RouterView, useRouter } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
+import { useAuthStore } from './stores/auth'
+import { computed } from 'vue'
+
+const authStore = useAuthStore()
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+const username = computed(() => authStore.user)
+const router = useRouter()
+
+function logout(command: string) {
+    authStore.logout()
+    router.push('/')
+}
 </script>
 
 <template>
@@ -14,6 +26,17 @@ import HelloWorld from './components/HelloWorld.vue'
         <nav class="nav-links">
           <router-link to="/appointment" class="nav-link" active-class="active-link">Appointment</router-link>
           <router-link to="/schedule" class="nav-link" active-class="active-link">Schedule</router-link>
+          <el-dropdown v-if="isAuthenticated" class="user-dropdown">
+            <span class="user-link">
+              <el-icon><User /></el-icon>
+              {{ username }}
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item @click="logout">Logout</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </nav>
       </div>
     </el-header>
@@ -109,5 +132,26 @@ import HelloWorld from './components/HelloWorld.vue'
 
 .active-link::after {
   color: #4a90e2;
+}
+
+.user-dropdown {
+  margin-left: 2rem;
+  cursor: pointer;
+}
+
+.user-link {
+  color: #000000;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0 8px;
+  transition: color 0.2s;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.user-link:focus,
+.user-link:active {
+  outline: none !important;
+  box-shadow: none !important;
 }
 </style>
