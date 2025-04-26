@@ -3,18 +3,10 @@
     <div class="schedule-header">
       <h1>My Schedule</h1>
       <div class="view-toggle">
-        <button 
-          :class="{ active: view === 'calendar' }"
-          @click="view = 'calendar'"
-        >
+        <button :class="{ active: view === 'calendar' }" @click="view = 'calendar'">
           Calendar
         </button>
-        <button 
-          :class="{ active: view === 'list' }"
-          @click="view = 'list'"
-        >
-          List
-        </button>
+        <button :class="{ active: view === 'list' }" @click="view = 'list'">List</button>
       </div>
     </div>
 
@@ -29,14 +21,14 @@
         <div class="calendar-weekday" v-for="day in weekdays" :key="day">
           {{ day }}
         </div>
-        <div 
-          v-for="day in calendarDays" 
+        <div
+          v-for="day in calendarDays"
           :key="day.date"
           class="calendar-day"
-          :class="{ 
+          :class="{
             'current-month': day.isCurrentMonth,
-            'today': isToday(day.date),
-            'has-appointments': hasAppointments(day.date)
+            today: isToday(day.date),
+            'has-appointments': hasAppointments(day.date),
           }"
           @click="selectDate(day.date)"
         >
@@ -49,7 +41,7 @@
     <!-- List View -->
     <div v-else class="list-view">
       <div class="appointment-filters">
-        <select v-model="selectedDate" @change="filterAppointments">
+        <select v-model="selectedDate">
           <option value="all">All Dates</option>
           <option v-for="date in uniqueDates" :key="date" :value="date">
             {{ formatDate(date) }}
@@ -60,9 +52,9 @@
         <div v-if="filteredAppointments.length === 0" class="no-appointments">
           No appointments found
         </div>
-        <div 
-          v-else 
-          v-for="appointment in filteredAppointments" 
+        <div
+          v-else
+          v-for="appointment in filteredAppointments"
           :key="appointment.id"
           class="appointment-item"
         >
@@ -87,7 +79,10 @@
         <div class="appointment-info">
           <p><strong>Patient:</strong> {{ selectedAppointment.patientName }}</p>
           <p><strong>Date:</strong> {{ formatDate(selectedAppointment.date) }}</p>
-          <p><strong>Time:</strong> {{ formatTime(selectedAppointment.startTime) }} - {{ formatTime(selectedAppointment.endTime) }}</p>
+          <p>
+            <strong>Time:</strong> {{ formatTime(selectedAppointment.startTime) }} -
+            {{ formatTime(selectedAppointment.endTime) }}
+          </p>
           <p><strong>Procedure:</strong> {{ selectedAppointment.procedure }}</p>
           <p><strong>Status:</strong> {{ selectedAppointment.status }}</p>
         </div>
@@ -99,9 +94,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useAuthStore } from '../stores/auth'
 
-const authStore = useAuthStore()
 const view = ref<'calendar' | 'list'>('calendar')
 const currentDate = ref(new Date())
 const selectedDate = ref('all')
@@ -116,7 +109,7 @@ const appointments = ref([
     startTime: '09:00',
     endTime: '10:00',
     procedure: 'Regular Checkup',
-    status: 'confirmed'
+    status: 'confirmed',
   },
   {
     id: 2,
@@ -125,49 +118,49 @@ const appointments = ref([
     startTime: '14:00',
     endTime: '15:00',
     procedure: 'Teeth Cleaning',
-    status: 'pending'
-  }
+    status: 'pending',
+  },
 ])
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 const currentMonthYear = computed(() => {
-  return currentDate.value.toLocaleDateString('en-US', { 
-    month: 'long', 
-    year: 'numeric' 
+  return currentDate.value.toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
   })
 })
 
 const calendarDays = computed(() => {
   const year = currentDate.value.getFullYear()
   const month = currentDate.value.getMonth()
-  
+
   const firstDay = new Date(year, month, 1)
   const lastDay = new Date(year, month + 1, 0)
-  
+
   const days = []
   const startingDay = firstDay.getDay()
-  
+
   // Add days from previous month
   for (let i = startingDay - 1; i >= 0; i--) {
     const date = new Date(year, month, -i)
     days.push({
       date: date.toISOString().split('T')[0],
       day: date.getDate(),
-      isCurrentMonth: false
+      isCurrentMonth: false,
     })
   }
-  
+
   // Add days from current month
   for (let i = 1; i <= lastDay.getDate(); i++) {
     const date = new Date(year, month, i)
     days.push({
       date: date.toISOString().split('T')[0],
       day: i,
-      isCurrentMonth: true
+      isCurrentMonth: true,
     })
   }
-  
+
   // Add days from next month
   const remainingDays = 42 - days.length // 6 rows * 7 days
   for (let i = 1; i <= remainingDays; i++) {
@@ -175,38 +168,30 @@ const calendarDays = computed(() => {
     days.push({
       date: date.toISOString().split('T')[0],
       day: i,
-      isCurrentMonth: false
+      isCurrentMonth: false,
     })
   }
-  
+
   return days
 })
 
 const uniqueDates = computed(() => {
-  return [...new Set(appointments.value.map(a => a.date))].sort()
+  return [...new Set(appointments.value.map((a) => a.date))].sort()
 })
 
 const filteredAppointments = computed(() => {
   if (selectedDate.value === 'all') {
     return appointments.value
   }
-  return appointments.value.filter(a => a.date === selectedDate.value)
+  return appointments.value.filter((a) => a.date === selectedDate.value)
 })
 
 const prevMonth = () => {
-  currentDate.value = new Date(
-    currentDate.value.getFullYear(),
-    currentDate.value.getMonth() - 1,
-    1
-  )
+  currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() - 1, 1)
 }
 
 const nextMonth = () => {
-  currentDate.value = new Date(
-    currentDate.value.getFullYear(),
-    currentDate.value.getMonth() + 1,
-    1
-  )
+  currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 1)
 }
 
 const isToday = (date: string) => {
@@ -215,7 +200,7 @@ const isToday = (date: string) => {
 }
 
 const hasAppointments = (date: string) => {
-  return appointments.value.some(a => a.date === date)
+  return appointments.value.some((a) => a.date === date)
 }
 
 const selectDate = (date: string) => {
@@ -230,14 +215,14 @@ const formatDate = (date: string) => {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   })
 }
 
 const formatTime = (time: string) => {
   return new Date(`2000-01-01T${time}`).toLocaleTimeString('en-US', {
     hour: 'numeric',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 </script>
@@ -430,4 +415,4 @@ const formatTime = (time: string) => {
 .appointment-info p {
   margin: 0.5rem 0;
 }
-</style> 
+</style>

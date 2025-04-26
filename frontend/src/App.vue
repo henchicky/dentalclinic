@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { RouterLink, RouterView, useRouter } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 import { useAuthStore } from './stores/auth'
 import { computed } from 'vue'
 
@@ -9,9 +8,9 @@ const isAuthenticated = computed(() => authStore.isAuthenticated)
 const username = computed(() => authStore.user)
 const router = useRouter()
 
-function logout(command: string) {
-    authStore.logout()
-    router.push('/')
+function logout() {
+  authStore.logout()
+  router.push('/')
 }
 </script>
 
@@ -24,8 +23,12 @@ function logout(command: string) {
           <span class="clinic-name">Smiling Dental Clinic</span>
         </router-link>
         <nav class="nav-links">
-          <router-link to="/appointment" class="nav-link" active-class="active-link">Appointment</router-link>
-          <router-link to="/schedule" class="nav-link" active-class="active-link">Schedule</router-link>
+          <router-link to="/appointment" class="nav-link" active-class="active-link"
+            >Appointment</router-link
+          >
+          <router-link to="/schedule" class="nav-link" active-class="active-link"
+            >Schedule</router-link
+          >
           <el-dropdown v-if="isAuthenticated" class="user-dropdown">
             <span class="user-link">
               <el-icon><User /></el-icon>
@@ -40,7 +43,7 @@ function logout(command: string) {
         </nav>
       </div>
     </el-header>
-    
+
     <el-main>
       <router-view></router-view>
     </el-main>
@@ -72,7 +75,7 @@ function logout(command: string) {
 
 .custom-header {
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   border-bottom: 1px solid #eaeaea;
   padding: 0;
   height: 70px;

@@ -57,7 +57,7 @@ const handleLogin = async () => {
     error.value = ''
     await authStore.login(username.value, password.value)
     router.push({ name: 'schedule' })
-  } catch (err) {
+  } catch {
     error.value = 'Invalid username or password'
   } finally {
     loading.value = false
@@ -94,4 +94,4 @@ h2 {
   margin-bottom: 1rem;
   text-align: center;
 }
-</style> 
+</style>

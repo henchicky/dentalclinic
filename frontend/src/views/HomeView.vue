@@ -41,8 +41,16 @@
       <div class="about-content">
         <div class="about-text">
           <h2>About Smiling Dental Clinic</h2>
-          <p>At Smiling Dental Clinic, we believe that everyone deserves a healthy, beautiful smile. Our team of experienced dental professionals is committed to providing personalized, gentle care in a comfortable environment.</p>
-          <p>We use state-of-the-art technology and the latest dental techniques to ensure the best possible outcomes for our patients. Your comfort and satisfaction are our top priorities.</p>
+          <p>
+            At Smiling Dental Clinic, we believe that everyone deserves a healthy, beautiful smile.
+            Our team of experienced dental professionals is committed to providing personalized,
+            gentle care in a comfortable environment.
+          </p>
+          <p>
+            We use state-of-the-art technology and the latest dental techniques to ensure the best
+            possible outcomes for our patients. Your comfort and satisfaction are our top
+            priorities.
+          </p>
         </div>
         <div class="about-image">
           <div class="image-placeholder">Modern Dental Office</div>
@@ -55,15 +63,24 @@
       <h2>What Our Patients Say</h2>
       <div class="testimonials-grid">
         <div class="testimonial-card">
-          <p class="quote">"The team at Smiling Dental Clinic made me feel comfortable from the moment I walked in. My smile has never looked better!"</p>
+          <p class="quote">
+            "The team at Smiling Dental Clinic made me feel comfortable from the moment I walked in.
+            My smile has never looked better!"
+          </p>
           <p class="author">- Sarah Johnson</p>
         </div>
         <div class="testimonial-card">
-          <p class="quote">"Professional, friendly, and thorough. I highly recommend their services to anyone looking for quality dental care."</p>
+          <p class="quote">
+            "Professional, friendly, and thorough. I highly recommend their services to anyone
+            looking for quality dental care."
+          </p>
           <p class="author">- Michael Chen</p>
         </div>
         <div class="testimonial-card">
-          <p class="quote">"The modern facilities and caring staff made my dental visit a pleasant experience. Great results!"</p>
+          <p class="quote">
+            "The modern facilities and caring staff made my dental visit a pleasant experience.
+            Great results!"
+          </p>
           <p class="author">- Emily Rodriguez</p>
         </div>
       </div>
@@ -73,7 +90,10 @@
     <section class="cta">
       <div class="cta-content">
         <h2>Ready to Transform Your Smile?</h2>
-        <p>Schedule your appointment today and take the first step towards a healthier, more beautiful smile.</p>
+        <p>
+          Schedule your appointment today and take the first step towards a healthier, more
+          beautiful smile.
+        </p>
         <router-link to="/appointment" class="cta-button">Book Now</router-link>
       </div>
     </section>
@@ -91,8 +111,7 @@
 
 /* Hero Section */
 .hero {
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-              url('../assets/landing.jpg');
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../assets/landing.jpg');
   background-size: cover;
   background-position: center;
   height: 50vh;
@@ -164,7 +183,6 @@
   margin-bottom: 1rem;
 }
 
-/* About Section */
 .about {
   padding: 5rem 2rem;
   background-color: white;
@@ -284,17 +302,17 @@
   .hero h1 {
     font-size: 2.5rem;
   }
-  
+
   .subtitle {
     font-size: 1.2rem;
   }
-  
+
   .about-content {
     grid-template-columns: 1fr;
   }
-  
+
   .about-image {
     height: 300px;
   }
 }
-</style> 
+</style>

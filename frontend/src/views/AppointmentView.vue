@@ -7,12 +7,12 @@
             <span>Schedule Appointment</span>
           </div>
         </template>
-        
+
         <el-form :model="appointmentForm" label-width="120px">
-          <el-form-item label="Patient Name" required>
-            <el-input 
-              v-model="appointmentForm.patientName" 
-              placeholder="Enter patient name"
+          <el-form-item label="Name" required>
+            <el-input
+              v-model="appointmentForm.patientName"
+              placeholder="Enter name"
               :prefix-icon="User"
             />
           </el-form-item>
@@ -25,7 +25,6 @@
                   type="date"
                   placeholder="Select date"
                   :disabled-date="disabledDate"
-                  @change="handleDateChange"
                   style="width: 200px"
                 />
               </el-col>
@@ -59,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { reactive } from 'vue'
 import { User } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
@@ -74,7 +73,7 @@ const appointmentForm = reactive<AppointmentForm>({
   patientName: '',
   appointmentDate: null,
   appointmentTime: null,
-  description: ''
+  description: '',
 })
 
 // Disable past dates
@@ -84,45 +83,12 @@ const disabledDate = (time: Date) => {
   return time.getTime() < endOfToday.getTime()
 }
 
-// Disable hours outside business hours (9 AM - 5 PM)
-const disabledHours = () => {
-  const hours = []
-  for (let i = 0; i < 24; i++) {
-    if (i < 9 || i >= 17) {
-      hours.push(i)
-    }
-  }
-  return hours
-}
-
-// Only allow appointments on the hour or half hour
-const disabledMinutes = (hour: number) => {
-  const minutes = []
-  for (let i = 0; i < 60; i++) {
-    if (i % 30 !== 0) {
-      minutes.push(i)
-    }
-  }
-  return minutes
-}
-
-const handleDateChange = (date: Date) => {
-  // If the selected date is today, disable past hours
-  const now = new Date()
-  if (date && date.toDateString() === now.toDateString()) {
-    const currentHour = now.getHours()
-    const currentMinutes = now.getMinutes()
-    
-    // If current time is past business hours, disable time picker
-    if (currentHour >= 17) {
-      appointmentForm.appointmentTime = null
-      ElMessage.warning('Business hours are over for today')
-    }
-  }
-}
-
 const submitAppointment = () => {
-  if (!appointmentForm.patientName || !appointmentForm.appointmentDate || !appointmentForm.appointmentTime) {
+  if (
+    !appointmentForm.patientName ||
+    !appointmentForm.appointmentDate ||
+    !appointmentForm.appointmentTime
+  ) {
     ElMessage.error('Please fill in all required fields')
     return
   }
@@ -130,6 +96,7 @@ const submitAppointment = () => {
   // Combine date and time
   const appointmentDateTime = new Date(appointmentForm.appointmentDate)
   const time = appointmentForm.appointmentTime
+  console.log(time)
   appointmentDateTime.setHours(time.getHours())
   appointmentDateTime.setMinutes(time.getMinutes())
 
@@ -137,9 +104,9 @@ const submitAppointment = () => {
   console.log('Submitting appointment:', {
     patientName: appointmentForm.patientName,
     appointmentTime: appointmentDateTime,
-    description: appointmentForm.description
+    description: appointmentForm.description,
   })
-  
+
   ElMessage.success('Appointment scheduled successfully!')
   resetForm()
 }
@@ -179,7 +146,9 @@ const timeOptions = {
 .box-card {
   width: 100%;
   border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(74, 144, 226, 0.08), 0 1.5px 6px rgba(44, 62, 80, 0.04);
+  box-shadow:
+    0 4px 24px rgba(74, 144, 226, 0.08),
+    0 1.5px 6px rgba(44, 62, 80, 0.04);
   padding: 2rem 1.5rem;
   background: #fff;
 }
@@ -195,16 +164,8 @@ const timeOptions = {
   margin-bottom: 1rem;
 }
 
-.el-form-item {
-  margin-bottom: 1.5rem;
-}
-
-.el-button {
-  min-width: 140px;
-}
-
 :deep(.el-date-editor.el-input),
 :deep(.el-date-editor.el-input__wrapper) {
   width: 100%;
 }
-</style> 
+</style>
