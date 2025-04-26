@@ -5,7 +5,7 @@
       <div class="hero-content">
         <h1>Welcome to Smiling Dental Clinic</h1>
         <p class="subtitle">Your trusted partner in dental care and beautiful smiles</p>
-        <router-link to="/login" class="cta-button">Book an Appointment</router-link>
+        <router-link to="/appointment" class="cta-button">Book an Appointment</router-link>
       </div>
     </section>
 
@@ -74,7 +74,7 @@
       <div class="cta-content">
         <h2>Ready to Transform Your Smile?</h2>
         <p>Schedule your appointment today and take the first step towards a healthier, more beautiful smile.</p>
-        <router-link to="/login" class="cta-button">Book Now</router-link>
+        <router-link to="/appointment" class="cta-button">Book Now</router-link>
       </div>
     </section>
   </div>
@@ -92,10 +92,10 @@
 /* Hero Section */
 .hero {
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-              url('https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+              url('../assets/landing.jpg');
   background-size: cover;
   background-position: center;
-  height: 80vh;
+  height: 50vh;
   display: flex;
   align-items: center;
   justify-content: center;

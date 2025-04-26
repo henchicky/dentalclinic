@@ -1,62 +1,63 @@
 <template>
-  <div class="appointment-form">
-    <el-card class="box-card">
-      <template #header>
-        <div class="card-header">
-          <span>Schedule New Appointment</span>
-        </div>
-      </template>
-      
-      <el-form :model="appointmentForm" label-width="120px">
-        <el-form-item label="Patient Name" required>
-          <el-input 
-            v-model="appointmentForm.patientName" 
-            placeholder="Enter patient name"
-            :prefix-icon="User"
-          />
-        </el-form-item>
+  <div class="appointment-form-bg">
+    <div class="appointment-form-center">
+      <el-card class="box-card">
+        <template #header>
+          <div class="card-header">
+            <span>Schedule New Appointment</span>
+          </div>
+        </template>
+        
+        <el-form :model="appointmentForm" label-width="120px">
+          <el-form-item label="Patient Name" required>
+            <el-input 
+              v-model="appointmentForm.patientName" 
+              placeholder="Enter patient name"
+              :prefix-icon="User"
+            />
+          </el-form-item>
 
-        <el-form-item label="Appointment" required>
-          <el-row :gutter="20">
-            <el-col :span="12">
-              <el-date-picker
-                v-model="appointmentForm.appointmentDate"
-                type="date"
-                placeholder="Select date"
-                :shortcuts="dateShortcuts"
-                :disabled-date="disabledDate"
-                @change="handleDateChange"
-                style="width: 200px"
-              />
-            </el-col>
-            <el-col :span="12">
-              <el-time-picker
-                v-model="appointmentForm.appointmentTime"
-                placeholder="Select time"
-                format="HH:mm"
-                :disabled-hours="disabledHours"
-                :disabled-minutes="disabledMinutes"
-                style="width: 200px"
-              />
-            </el-col>
-          </el-row>
-        </el-form-item>
+          <el-form-item label="Appointment" required>
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <el-date-picker
+                  v-model="appointmentForm.appointmentDate"
+                  type="date"
+                  placeholder="Select date"
+                  :shortcuts="dateShortcuts"
+                  :disabled-date="disabledDate"
+                  @change="handleDateChange"
+                  style="width: 200px"
+                />
+              </el-col>
+              <el-col :span="12">
+                <el-time-picker
+                  v-model="appointmentForm.appointmentTime"
+                  placeholder="Select time"
+                  format="HH:mm"
+                  :disabled-hours="disabledHours"
+                  :disabled-minutes="disabledMinutes"
+                  style="width: 200px"
+                />
+              </el-col>
+            </el-row>
+          </el-form-item>
 
-        <el-form-item label="Description">
-          <el-input
-            v-model="appointmentForm.description"
-            type="textarea"
-            :rows="4"
-            placeholder="Enter appointment description"
-          />
-        </el-form-item>
+          <el-form-item label="Description">
+            <el-input
+              v-model="appointmentForm.description"
+              type="textarea"
+              :rows="4"
+              placeholder="Enter appointment description"
+            />
+          </el-form-item>
 
-        <el-form-item>
-          <el-button type="primary" @click="submitAppointment">Schedule Appointment</el-button>
-          <el-button @click="resetForm">Reset</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
+          <el-form-item>
+            <el-button type="primary" @click="submitAppointment">Book</el-button>
+          </el-form-item>
+        </el-form>
+      </el-card>
+    </div>
   </div>
 </template>
 
@@ -173,26 +174,51 @@ const resetForm = () => {
 </script>
 
 <style scoped>
-.appointment-form {
+.appointment-form-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e3f0ff 0%, #f8f9fa 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.appointment-form-center {
+  width: 100%;
   max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+  margin: 2rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.box-card {
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(74, 144, 226, 0.08), 0 1.5px 6px rgba(44, 62, 80, 0.04);
+  padding: 2rem 1.5rem;
+  background: #fff;
 }
 
 .card-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #357abd;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
 }
 
-.box-card {
-  margin-bottom: 20px;
+.el-form-item {
+  margin-bottom: 1.5rem;
 }
 
-:deep(.el-date-editor.el-input) {
-  width: 100%;
+.el-button {
+  min-width: 140px;
 }
 
+:deep(.el-date-editor.el-input),
 :deep(.el-date-editor.el-input__wrapper) {
   width: 100%;
 }
