@@ -1,7 +1,6 @@
 package com.demo.dentalclinic.controller;
 
-import com.demo.dentalclinic.model.Appointment;
-import com.demo.dentalclinic.service.AppointmentService;
+import com.demo.dentalclinic.model.Schedule;
 import com.demo.dentalclinic.service.ScheduleService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/appointments")
-@Tag(name = "Appointment Controller")
+@RequestMapping("/api/schedules")
+@Tag(name = "Schedule Controller")
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
@@ -23,31 +22,39 @@ public class ScheduleController {
     }
 
     @GetMapping
-    public List<Appointment> getAllAppointments() {
-        return scheduleService.getAllAppointments();
+    public List<Schedule> getAllSchedules() {
+        return scheduleService.getAllSchedules();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Appointment> getAppointmentById(
+    public ResponseEntity<Schedule> getScheduleById(
             @PathVariable Long id) {
-        return scheduleService.getAppointmentById(id)
+        return scheduleService.getScheduleById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<List<Schedule>> getSchedulesByDoctorId(
+            @PathVariable Long id) {
+        return scheduleService.getScheduleById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Appointment createAppointment(
-            @RequestBody Appointment appointment) {
-        return scheduleService.createAppointment(appointment);
+    public Schedule createSchedule(
+            @RequestBody Schedule schedule) {
+        return scheduleService.createSchedule(schedule);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Appointment> updateAppointment(
+    public ResponseEntity<Schedule> updateAppointment(
             @PathVariable Long id,
-            @RequestBody Appointment appointmentDetails) {
+            @RequestBody Schedule schedule) {
         try {
-            Appointment updatedAppointment = scheduleService.updateAppointment(id, appointmentDetails);
-            return ResponseEntity.ok(updatedAppointment);
+            Schedule updateSchedule = scheduleService.updateSchedule(id, schedule);
+            return ResponseEntity.ok(updateSchedule);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
@@ -56,7 +63,7 @@ public class ScheduleController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAppointment(
             @PathVariable Long id) {
-        scheduleService.deleteAppointment(id);
+        scheduleService.deleteScheduleById(id);
         return ResponseEntity.ok().build();
     }
 } 

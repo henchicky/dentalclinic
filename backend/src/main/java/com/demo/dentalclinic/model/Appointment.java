@@ -3,6 +3,8 @@ package com.demo.dentalclinic.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import com.dentalclinic.enums.AppointmentStatus;
+
 @Entity
 @Table(name = "appointments")
 public class Appointment {
@@ -19,6 +21,12 @@ public class Appointment {
     
     @Column
     private String description;
+
+    @Column
+    private String doctorId;
+
+    @Column
+    private AppointmentStatus status;
     
     public Long getId() {
         return id;

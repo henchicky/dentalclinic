@@ -22,6 +22,10 @@ public class AppointmentService {
         return appointmentRepository.findAll();
     }
 
+    public List<Appointment> getAppointmentsByDoctorId(String id) {
+        return appointmentRepository.findByDoctorId(id);
+    }
+
     public Optional<Appointment> getAppointmentById(Long id) {
         return appointmentRepository.findById(id);
     }
