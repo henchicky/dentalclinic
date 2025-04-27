@@ -22,7 +22,7 @@ public class AppointmentService {
         return appointmentRepository.findAll();
     }
 
-    public List<Appointment> getAppointmentsByDoctorId(String id) {
+    public List<Appointment> getAppointmentsByDentistId(Long id) {
         return appointmentRepository.findByDoctorId(id);
     }
 
@@ -43,9 +43,5 @@ public class AppointmentService {
         appointment.setDescription(appointmentDetails.getDescription());
 
         return appointmentRepository.save(appointment);
-    }
-
-    public void deleteAppointment(Long id) {
-        appointmentRepository.deleteById(id);
     }
 } 

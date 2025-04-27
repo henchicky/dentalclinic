@@ -1,4 +1,4 @@
-package com.dentalclinic.enums;
+package com.demo.dentalclinic.enums;
 
 public enum AppointmentStatus {
     Upcoming,
