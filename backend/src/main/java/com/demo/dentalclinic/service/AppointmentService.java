@@ -7,7 +7,6 @@ import com.demo.dentalclinic.repository.AppointmentRepository;
 import com.demo.dentalclinic.repository.DentistRepository;
 import com.demo.dentalclinic.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,12 +24,7 @@ public class AppointmentService {
     private final AppointmentTypeService appointmentTypeService;
 
     @Autowired
-    public AppointmentService(
-            AppointmentRepository appointmentRepository,
-            DentistRepository dentistRepository,
-            DentistScheduleService dentistScheduleService,
-            AppointmentTypeService appointmentTypeService,
-            PatientRepository patientRepository) {
+    public AppointmentService(AppointmentRepository appointmentRepository, DentistRepository dentistRepository, DentistScheduleService dentistScheduleService, AppointmentTypeService appointmentTypeService, PatientRepository patientRepository) {
         this.patientRepository = patientRepository;
         this.appointmentRepository = appointmentRepository;
         this.dentistRepository = dentistRepository;
@@ -39,34 +33,20 @@ public class AppointmentService {
     }
 
     public Appointment createAppointment(AppointmentRequest request) {
-        AppointmentType appointmentType = appointmentTypeService.getAppointmentTypeById(request.getAppointmentTypeId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid appointment type ID"));
+        AppointmentType appointmentType = appointmentTypeService.getAppointmentTypeById(request.getAppointmentTypeId()).orElseThrow(() -> new IllegalArgumentException("Invalid appointment type ID"));
 
-        // Get dentist
-        // Extract calculation of appointment time range
         LocalDateTime appointmentStart = request.getAppointmentTime();
         LocalDateTime appointmentEnd = appointmentStart.plusMinutes(appointmentType.getDurationMinutes());
 
-// Use Stream API to find the first available dentist
-        Dentist availableDentist = dentistRepository.findAll().stream()
-                .filter(dentist -> isDentistAvailableForAppointment(
-                        dentist.getId(),
-                        appointmentStart.toLocalDate(),
-                        appointmentStart.toLocalTime(),
-                        appointmentEnd.toLocalTime()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No available dentist"));
+        Dentist availableDentist = dentistRepository.findAll().stream().filter(dentist -> isDentistAvailableForAppointment(dentist.getId(), appointmentStart.toLocalDate(), appointmentStart.toLocalTime(), appointmentEnd.toLocalTime())).findFirst().orElseThrow(() -> new IllegalArgumentException("No available dentist"));
 
-        // Get patient
-        Patient patient = patientRepository.findByIdentificationNumber(request.getIdentificationNumber())
-                .orElseGet(() -> {
-                    Patient newPatient = new Patient();
-                    newPatient.setName(request.getName());
-                    newPatient.setIdentificationNumber(request.getIdentificationNumber());
-                    return patientRepository.save(newPatient);
-                });
+        Patient patient = patientRepository.findByIdentificationNumber(request.getIdentificationNumber()).orElseGet(() -> {
+            Patient newPatient = new Patient();
+            newPatient.setName(request.getName());
+            newPatient.setIdentificationNumber(request.getIdentificationNumber());
+            return patientRepository.save(newPatient);
+        });
 
-        // Create new appointment
         Appointment appointment = new Appointment();
         appointment.setAppointmentType(appointmentType);
         appointment.setDentist(availableDentist);
@@ -77,35 +57,25 @@ public class AppointmentService {
         return appointmentRepository.save(appointment);
     }
 
-    private boolean isDentistAvailableForAppointment(
-            Long dentistId,
-            LocalDate date,
-            LocalTime startTime,
-            LocalTime endTime) {
+    private boolean isDentistAvailableForAppointment(Long dentistId, LocalDate date, LocalTime startTime, LocalTime endTime) {
 
         // Get all available periods for the dentist on the given date
         List<DentistSchedulePeriod> availablePeriods = dentistScheduleService.getAvailablePeriods(dentistId, date);
 
         // Check if the appointment time falls within any available period
-        return availablePeriods.stream()
-                .anyMatch(period -> {
-                    // Check if the appointment time is within the available period
-                    boolean isWithinPeriod = !startTime.isBefore(period.getStartTime()) &&
-                            !endTime.isAfter(period.getEndTime());
+        return availablePeriods.stream().anyMatch(period -> {
+            // Check if the appointment time is within the available period
+            boolean isWithinPeriod = !startTime.isBefore(period.getStartTime()) && !endTime.isAfter(period.getEndTime());
 
-                    if (!isWithinPeriod) {
-                        return false;
-                    }
+            if (!isWithinPeriod) {
+                return false;
+            }
 
-                    // Check for existing appointments that might overlap
-                    List<Appointment> existingAppointments = appointmentRepository
-                            .findByDentistIdAndAppointmentTimeBetween(
-                                    dentistId,
-                                    date.atTime(startTime),
-                                    date.atTime(endTime));
+            // Check for existing appointments that might overlap
+            List<Appointment> existingAppointments = appointmentRepository.findByDentistIdAndAppointmentTimeBetween(dentistId, date.atTime(startTime), date.atTime(endTime));
 
-                    return existingAppointments.isEmpty();
-                });
+            return existingAppointments.isEmpty();
+        });
     }
 
     public List<Appointment> getDentistAppointments(Long dentistId) {

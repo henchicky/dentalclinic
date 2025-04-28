@@ -1,4 +1,3 @@
-
 package com.demo.dentalclinic.config;
 
 import com.demo.dentalclinic.enums.AppointmentStatus;
@@ -37,7 +36,7 @@ public class DataSeeder {
             AppointmentRepository appointmentRepository,
             DentistSchedulePeriodRepository dentistSchedulePeriodRepository
     ) {
-        return args -> {
+        return _ -> {
             seedAppointmentTypes(appointmentTypeRepository);
 
             seedPatients(patientRepository);
@@ -45,7 +44,7 @@ public class DataSeeder {
             seedDentists(dentistRepository);
 
             seedAppointments(dentistRepository, appointmentTypeRepository, patientRepository, appointmentRepository);
-            
+
             seedDentistSchedulePeriods(dentistRepository, dentistSchedulePeriodRepository);
         };
     }
@@ -67,10 +66,10 @@ public class DataSeeder {
             Dentist dentist = savedDentists.get(i % savedDentists.size());
             Patient patient = savedPatients.get(i % savedPatients.size());
             AppointmentType appointmentType = savedAppointmentTypes.get(i % savedAppointmentTypes.size());
-            
+
             // Create appointment at different times
             LocalDateTime appointmentTime = startDateTime.plusHours(i % 8).plusDays(i / 8);
-            
+
             appointments.add(createAppointment(dentist, patient, appointmentType, appointmentTime, AppointmentStatus.UPCOMING));
         }
 
@@ -81,13 +80,13 @@ public class DataSeeder {
             Dentist dentist = savedDentists.get(i % savedDentists.size());
             Patient patient = savedPatients.get((i + 3) % savedPatients.size());
             AppointmentType appointmentType = savedAppointmentTypes.get((i + 2) % savedAppointmentTypes.size());
-            
+
             // Create appointment at different past times
             LocalDateTime appointmentTime = pastStartDateTime.plusHours(i % 7).plusDays(i / 7);
-            
+
             // Alternate between COMPLETED and CANCELLED status
             AppointmentStatus status = (i % 2 == 0) ? AppointmentStatus.COMPLETED : AppointmentStatus.CANCELLED;
-            
+
             appointments.add(createAppointment(dentist, patient, appointmentType, appointmentTime, status));
         }
 
@@ -150,16 +149,16 @@ public class DataSeeder {
         patient.setIdentificationNumber(identificationNumber);
         return patient;
     }
-    
+
     private Dentist createDentist(String name, String password) {
         Dentist dentist = new Dentist();
         dentist.setName(name);
         dentist.setPassword(password);
         return dentist;
     }
-    
-    private Appointment createAppointment(Dentist dentist, Patient patient, AppointmentType appointmentType, 
-                                         LocalDateTime appointmentTime, AppointmentStatus status) {
+
+    private Appointment createAppointment(Dentist dentist, Patient patient, AppointmentType appointmentType,
+                                          LocalDateTime appointmentTime, AppointmentStatus status) {
         Appointment appointment = new Appointment();
         appointment.setDentist(dentist);
         appointment.setPatient(patient);
@@ -168,86 +167,86 @@ public class DataSeeder {
         appointment.setAppointmentStatus(status);
         return appointment;
     }
-    
+
     private void seedDentistSchedulePeriods(DentistRepository dentistRepository, DentistSchedulePeriodRepository dentistSchedulePeriodRepository) {
         List<Dentist> dentists = dentistRepository.findAll();
         List<DentistSchedulePeriod> schedulePeriods = new ArrayList<>();
-        
+
         // Create schedule periods for 14 days (2 weeks) starting from tomorrow
         LocalDate startDate = LocalDate.now().plusDays(1);
-        
+
         for (Dentist dentist : dentists) {
             for (int day = 0; day < 14; day++) {
                 LocalDate currentDate = startDate.plusDays(day);
-                
+
                 // Skip weekends (Saturday and Sunday)
                 if (currentDate.getDayOfWeek().getValue() >= 6) {
                     continue;
                 }
-                
+
                 // Morning availability (9:00 AM - 12:00 PM)
                 schedulePeriods.add(createSchedulePeriod(
-                    dentist,
-                    currentDate,
-                    LocalTime.of(9, 0),
-                    LocalTime.of(12, 0),
-                    AvailabilityType.AVAILABLE,
-                    "Morning shift"
+                        dentist,
+                        currentDate,
+                        LocalTime.of(9, 0),
+                        LocalTime.of(12, 0),
+                        AvailabilityType.AVAILABLE,
+                        "Morning shift"
                 ));
-                
+
                 // Lunch break (12:00 PM - 1:00 PM)
                 schedulePeriods.add(createSchedulePeriod(
-                    dentist,
-                    currentDate,
-                    LocalTime.of(12, 0),
-                    LocalTime.of(13, 0),
-                    AvailabilityType.UNAVAILABLE,
-                    "Lunch break"
+                        dentist,
+                        currentDate,
+                        LocalTime.of(12, 0),
+                        LocalTime.of(13, 0),
+                        AvailabilityType.UNAVAILABLE,
+                        "Lunch break"
                 ));
-                
+
                 // Afternoon availability (1:00 PM - 5:00 PM)
                 schedulePeriods.add(createSchedulePeriod(
-                    dentist,
-                    currentDate,
-                    LocalTime.of(13, 0),
-                    LocalTime.of(17, 0),
-                    AvailabilityType.AVAILABLE,
-                    "Afternoon shift"
+                        dentist,
+                        currentDate,
+                        LocalTime.of(13, 0),
+                        LocalTime.of(17, 0),
+                        AvailabilityType.AVAILABLE,
+                        "Afternoon shift"
                 ));
-                
+
                 // Add some random unavailable periods for meetings, etc.
                 if (day % 3 == 0) {
                     schedulePeriods.add(createSchedulePeriod(
-                        dentist,
-                        currentDate,
-                        LocalTime.of(14, 0),
-                        LocalTime.of(15, 0),
-                        AvailabilityType.UNAVAILABLE,
-                        "Staff meeting"
+                            dentist,
+                            currentDate,
+                            LocalTime.of(14, 0),
+                            LocalTime.of(15, 0),
+                            AvailabilityType.UNAVAILABLE,
+                            "Staff meeting"
                     ));
                 }
-                
+
                 // Dr. Jennifer Smith has special hours on Wednesdays
-                if (dentist.getName().equals("Dr. Jennifer Smith") && 
-                    currentDate.getDayOfWeek().getValue() == 3) {
+                if (dentist.getName().equals("Dr. Jennifer Smith") &&
+                        currentDate.getDayOfWeek().getValue() == 3) {
                     schedulePeriods.add(createSchedulePeriod(
-                        dentist,
-                        currentDate,
-                        LocalTime.of(17, 0),
-                        LocalTime.of(19, 0),
-                        AvailabilityType.AVAILABLE,
-                        "Evening appointments"
+                            dentist,
+                            currentDate,
+                            LocalTime.of(17, 0),
+                            LocalTime.of(19, 0),
+                            AvailabilityType.AVAILABLE,
+                            "Evening appointments"
                     ));
                 }
             }
         }
-        
+
         dentistSchedulePeriodRepository.saveAll(schedulePeriods);
     }
-    
-    private DentistSchedulePeriod createSchedulePeriod(Dentist dentist, LocalDate date, 
-                                                      LocalTime startTime, LocalTime endTime, 
-                                                      AvailabilityType type, String description) {
+
+    private DentistSchedulePeriod createSchedulePeriod(Dentist dentist, LocalDate date,
+                                                       LocalTime startTime, LocalTime endTime,
+                                                       AvailabilityType type, String description) {
         DentistSchedulePeriod period = new DentistSchedulePeriod();
         period.setDentist(dentist);
         period.setDate(date);
