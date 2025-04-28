@@ -13,7 +13,6 @@ import lombok.Setter;
 @Getter
 public class Appointment {
     
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,12 +26,13 @@ public class Appointment {
     @Column(nullable = false)
     private LocalDateTime appointmentTime;
     
-    @Column
-    private String description;
-
-    @Column
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dentist_id", nullable = false)
     private Long dentistId;
 
     @Column
+    private String description;
+
+    @Column(nullable = false)
     private AppointmentStatus appointmentStatus;
 } 

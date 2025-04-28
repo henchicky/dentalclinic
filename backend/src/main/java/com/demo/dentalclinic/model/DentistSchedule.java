@@ -24,13 +24,4 @@ public class DentistSchedule {
 
     @Column(nullable = false)
     private LocalDateTime endTime;
-
-    @Column(nullable = false)
-    private boolean isAvailable;
-
-    @Column
-    private String description;
-
-    @Column
-    private Integer maxAppointments;
 }
