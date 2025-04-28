@@ -24,7 +24,7 @@ public class DentistScheduleService {
     }
 
     public List<DentistSchedule> getAvailableSlots(Long dentistId, LocalDateTime startTime, LocalDateTime endTime) {
-        return dentistScheduleRepository.findByDentistIdAndAvailableTrueAndStartTimeBetween(
+        return dentistScheduleRepository.findByDentistIdAndIsAvailableTrueAndStartTimeBetween(
                 dentistId, startTime, endTime);
     }
 

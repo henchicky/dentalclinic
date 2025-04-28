@@ -3,14 +3,12 @@ package com.demo.dentalclinic.service;
 import com.demo.dentalclinic.enums.AppointmentStatus;
 import com.demo.dentalclinic.model.Appointment;
 import com.demo.dentalclinic.model.Dentist;
-import com.demo.dentalclinic.model.DentistSchedule;
 import com.demo.dentalclinic.repository.AppointmentRepository;
 import com.demo.dentalclinic.repository.DentistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 

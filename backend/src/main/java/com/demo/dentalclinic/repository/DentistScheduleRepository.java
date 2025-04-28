@@ -1,6 +1,8 @@
 package com.demo.dentalclinic.repository;
 
 import com.demo.dentalclinic.model.DentistSchedule;
+import org.springframework.data.domain.Limit;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,8 +14,8 @@ import java.util.List;
 public interface DentistScheduleRepository extends JpaRepository<DentistSchedule, Long> {
     List<DentistSchedule> findByDentistIdAndStartTimeBetween(
             Long dentistId, LocalDateTime startTime, LocalDateTime endTime);
-    
-    List<DentistSchedule> findByDentistIdAndAvailableTrueAndStartTimeBetween(
+
+    List<DentistSchedule> findByDentistIdAndIsAvailableTrueAndStartTimeBetween(
             Long dentistId, LocalDateTime startTime, LocalDateTime endTime);
     
     @Query("SELECT ds FROM DentistSchedule ds WHERE ds.dentist.id = :dentistId " +

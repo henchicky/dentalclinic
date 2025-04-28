@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Profile;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
 
 @Configuration
 @Profile("!test") // Don't run in test environment
@@ -23,7 +22,7 @@ public class DataSeeder {
 
     @Bean
     public CommandLineRunner initData(DentistRepository dentistRepository) {
-        return args -> {
+        return _ -> {
             // Create sample dentists
             Dentist dentist1 = new Dentist();
             dentist1.setName("Dr. John Smith");
