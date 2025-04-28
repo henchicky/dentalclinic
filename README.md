@@ -160,13 +160,15 @@ The frontend application will start at: `http://localhost:5173`
 Patients can book an appointment by going to the website.
 They will select the type of appointment they want and choose from the available timeslots. 
 
-I want multiple endpoints
+I want multiple endpoints to support the system.
 1. Get Endpoint - return the different types of appointments
 2. Get Endpoint - return the available timeslots for patients to choose
 3. Get Endpoint - return the dentist's schedule group by day. Dentist should be able to see their appointments and free time.
 4. Post endpoint - for dentist to create their schedule by day
-Dentist can input their start and end time, whether they want 1 hour lunch break.
+Dentist can input their start and end time, and also input unavailable periods. Unavailable periods can be for lunch breaks or o
 
 Come up with a suitable name for the endpoint.
-Come up with a suitable database schema to support such these usecase.
-Suggest and come up with better ideas
+Come up with a suitable database schema to support such these usecases.
+Suggest and come up with better ideas.
+
+Do not do any code changes yet. 

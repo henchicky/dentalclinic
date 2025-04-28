@@ -1,69 +1,73 @@
+
 package com.demo.dentalclinic.config;
 
-import com.demo.dentalclinic.model.Dentist;
-import com.demo.dentalclinic.model.DentistSchedule;
+import com.demo.dentalclinic.model.AppointmentType;
+import com.demo.dentalclinic.model.Patient;
+import com.demo.dentalclinic.repository.AppointmentTypeRepository;
 import com.demo.dentalclinic.repository.DentistRepository;
-import com.demo.dentalclinic.repository.DentistScheduleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.demo.dentalclinic.repository.PatientRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
-@Profile("!test") // Don't run in test environment
+@Profile("!test")
 public class DataSeeder {
 
-    @Autowired
-    private DentistScheduleRepository dentistScheduleRepository;
-
     @Bean
-    public CommandLineRunner initData(DentistRepository dentistRepository) {
-        return _ -> {
-            // Create sample dentists
-            Dentist dentist1 = new Dentist();
-            dentist1.setName("Dr. John Smith");
-            dentist1.setPassword("password123");
-            dentist1 = dentistRepository.save(dentist1);
+    public CommandLineRunner initData(
+            DentistRepository dentistRepository,
+            AppointmentTypeRepository appointmentTypeRepository,
+            PatientRepository patientRepository
+    ) {
+        return args -> {
+            // Seed AppointmentTypes
+            List<AppointmentType> appointmentTypes = Arrays.asList(
+                    createAppointmentType("Cleaning", 30),
+                    createAppointmentType("Extraction", 45),
+                    createAppointmentType("Consultation", 30),
+                    createAppointmentType("Filling", 30),
+                    createAppointmentType("Root Canal", 90),
+                    createAppointmentType("Crown", 60),
+                    createAppointmentType("Bridge", 90),
+                    createAppointmentType("Denture", 60),
+                    createAppointmentType("Braces", 60),
+                    createAppointmentType("Others", 30)
+            );
+            appointmentTypeRepository.saveAll(appointmentTypes);
 
-            Dentist dentist2 = new Dentist();
-            dentist2.setName("Dr. Sarah Johnson");
-            dentist2.setPassword("password123");
-            dentist2 = dentistRepository.save(dentist2);
-
-            // Create sample schedules for the next 7 days
-            LocalDateTime now = LocalDateTime.now();
-            for (int i = 0; i < 7; i++) {
-                LocalDateTime currentDate = now.plusDays(i);
-                
-                // Create a morning schedule (9 AM - 12 PM)
-                createSchedule(dentist1, currentDate, LocalTime.of(9, 0), LocalTime.of(12, 0), true, 3);
-                createSchedule(dentist2, currentDate, LocalTime.of(9, 0), LocalTime.of(12, 0), true, 3);
-                
-                // Create a lunch break (12 PM - 1 PM)
-                createSchedule(dentist1, currentDate, LocalTime.of(12, 0), LocalTime.of(13, 0), false, 0);
-                createSchedule(dentist2, currentDate, LocalTime.of(12, 0), LocalTime.of(13, 0), false, 0);
-                
-                // Create a afternoon schedule (1 PM - 5 PM)
-                createSchedule(dentist1, currentDate, LocalTime.of(13, 0), LocalTime.of(17, 0), true, 4);
-                createSchedule(dentist2, currentDate, LocalTime.of(13, 0), LocalTime.of(17, 0), true, 4);
-            }
+            // Seed Patients
+            List<Patient> patients = Arrays.asList(
+                    createPatient("John Doe", "P001"),
+                    createPatient("Jane Smith", "P002"),
+                    createPatient("Robert Johnson", "P003"),
+                    createPatient("Maria Garcia", "P004"),
+                    createPatient("David Lee", "P005"),
+                    createPatient("Sarah Wilson", "P006"),
+                    createPatient("Michael Brown", "P007"),
+                    createPatient("Emily Davis", "P008"),
+                    createPatient("James Miller", "P009"),
+                    createPatient("Lisa Anderson", "P010")
+            );
+            patientRepository.saveAll(patients);
         };
     }
 
-    private void createSchedule(Dentist dentist, LocalDateTime date, LocalTime startTime, LocalTime endTime, 
-                              boolean isAvailable, int maxAppointments) {
-        DentistSchedule schedule = new DentistSchedule();
-        schedule.setDentist(dentist);
-        schedule.setStartTime(LocalDateTime.of(date.toLocalDate(), startTime));
-        schedule.setEndTime(LocalDateTime.of(date.toLocalDate(), endTime));
-        schedule.setAvailable(isAvailable);
-        schedule.setMaxAppointments(maxAppointments);
-        schedule.setDescription(isAvailable ? "Available for appointments" : "Lunch break");
-        
-        dentistScheduleRepository.save(schedule);
+    private AppointmentType createAppointmentType(String name, int duration) {
+        AppointmentType appointmentType = new AppointmentType();
+        appointmentType.setName(name);
+        appointmentType.setDurationMinutes(duration);
+        return appointmentType;
     }
-} 
+
+    private Patient createPatient(String name, String identificationNumber) {
+        Patient patient = new Patient();
+        patient.setName(name);
+        patient.setIdentificationNumber(identificationNumber);
+        return patient;
+    }
+}

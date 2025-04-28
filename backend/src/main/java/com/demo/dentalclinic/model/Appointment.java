@@ -1,38 +1,38 @@
 package com.demo.dentalclinic.model;
 
+import com.demo.dentalclinic.enums.AppointmentStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-import com.demo.dentalclinic.enums.AppointmentStatus;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "appointments")
-@Setter
 @Getter
+@Setter
 public class Appointment {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String patientName;
-
-    @Column(nullable = false)
-    private String identificationNumber;
-    
-    @Column(nullable = false)
-    private LocalDateTime appointmentTime;
-    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dentist_id", nullable = false)
-    private Long dentistId;
+    private Dentist dentist;
 
-    @Column
-    private String description;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "patient_id", nullable = false)
+    private Patient patient;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "appointment_type_id", nullable = false)
+    private AppointmentType appointmentType;
+
+    @Column(nullable = false)
+    private LocalDateTime appointmentTime;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AppointmentStatus appointmentStatus;
 } 

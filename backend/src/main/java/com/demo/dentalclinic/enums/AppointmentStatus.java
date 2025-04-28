@@ -1,7 +1,8 @@
 package com.demo.dentalclinic.enums;
 
 public enum AppointmentStatus {
-    Upcoming,
-    Canceled,
-    Completed
+    UPCOMING,
+    COMPLETED,
+    CANCELLED,
+    NO_SHOW
 }
