@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DentistRepository extends JpaRepository<Dentist, Long> {
-} 
+    Dentist getDentistsById(Long id);
+}

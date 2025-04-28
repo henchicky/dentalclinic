@@ -2,6 +2,7 @@ package com.demo.dentalclinic.model;
 
 import com.demo.dentalclinic.enums.AppointmentStatus;
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 import lombok.Getter;
@@ -22,7 +23,7 @@ public class Appointment {
     private Dentist dentist;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_id", nullable = false)
+    @JoinColumn(name = "patient_id", nullable = false, referencedColumnName = "id")
     private Patient patient;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,6 +1,7 @@
 package com.demo.dentalclinic.controller;
 
 import com.demo.dentalclinic.model.DentistSchedulePeriod;
+import com.demo.dentalclinic.dto.DentistScheduleRequest;
 import com.demo.dentalclinic.service.DentistScheduleService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,8 @@ public class DentistController {
     @PostMapping("/{dentistId}/schedule")
     public DentistSchedulePeriod createSchedulePeriod(
             @PathVariable Long dentistId,
-            @RequestBody DentistSchedulePeriod schedulePeriod) {
-        return dentistScheduleService.createSchedulePeriod(schedulePeriod);
+            @RequestBody DentistScheduleRequest request) {
+        return dentistScheduleService.createSchedulePeriod(request, dentistId);
     }
 
     @GetMapping("/{dentistId}/schedule")

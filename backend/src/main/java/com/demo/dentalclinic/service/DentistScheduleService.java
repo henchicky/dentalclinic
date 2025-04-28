@@ -1,12 +1,15 @@
 package com.demo.dentalclinic.service;
 
+import com.demo.dentalclinic.dto.DentistScheduleRequest;
 import com.demo.dentalclinic.model.DentistSchedulePeriod;
+import com.demo.dentalclinic.repository.DentistRepository;
 import com.demo.dentalclinic.repository.DentistSchedulePeriodRepository;
 import com.demo.dentalclinic.enums.AvailabilityType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -14,10 +17,12 @@ import java.util.List;
 public class DentistScheduleService {
 
     private final DentistSchedulePeriodRepository dentistSchedulePeriodRepository;
+    private final DentistRepository dentistRepository;
 
     @Autowired
-    public DentistScheduleService(DentistSchedulePeriodRepository dentistSchedulePeriodRepository) {
+    public DentistScheduleService(DentistSchedulePeriodRepository dentistSchedulePeriodRepository, DentistRepository dentistRepository) {
         this.dentistSchedulePeriodRepository = dentistSchedulePeriodRepository;
+        this.dentistRepository = dentistRepository;
     }
 
     public List<DentistSchedulePeriod> getDentistSchedule(Long dentistId, LocalDate date) {
@@ -28,7 +33,7 @@ public class DentistScheduleService {
         return dentistSchedulePeriodRepository.findByDentistIdAndDateBetween(dentistId, startDate, endDate);
     }
 
-    public DentistSchedulePeriod createSchedulePeriod(DentistSchedulePeriod schedulePeriod) {
+    public DentistSchedulePeriod createSchedulePeriod(DentistScheduleRequest schedulePeriod, Long dentistId) {
         // Validate time range
         if (schedulePeriod.getStartTime().isAfter(schedulePeriod.getEndTime())) {
             throw new IllegalArgumentException("Start time must be before end time");
@@ -36,7 +41,7 @@ public class DentistScheduleService {
 
         // Check for overlapping periods
         List<DentistSchedulePeriod> existingPeriods = dentistSchedulePeriodRepository
-            .findByDentistIdAndDate(schedulePeriod.getDentist().getId(), schedulePeriod.getDate());
+            .findByDentistIdAndDate(dentistId, schedulePeriod.getStartTime().toLocalDate());
 
         for (DentistSchedulePeriod existing : existingPeriods) {
             if (isOverlapping(existing, schedulePeriod)) {
@@ -44,14 +49,21 @@ public class DentistScheduleService {
             }
         }
 
-        return dentistSchedulePeriodRepository.save(schedulePeriod);
+        // Convert DentistScheduleRequest to DentistSchedulePeriod before saving
+        DentistSchedulePeriod newPeriod = new DentistSchedulePeriod();
+        newPeriod.setDentist(dentistRepository.getDentistsById(dentistId));
+        newPeriod.setStartTime(schedulePeriod.getStartTime().toLocalTime());
+        newPeriod.setEndTime(schedulePeriod.getEndTime().toLocalTime());
+        newPeriod.setType(schedulePeriod.getType());
+
+        return dentistSchedulePeriodRepository.save(newPeriod);
     }
 
-    private boolean isOverlapping(DentistSchedulePeriod existing, DentistSchedulePeriod newPeriod) {
+    private boolean isOverlapping(DentistSchedulePeriod existing, DentistScheduleRequest newPeriod) {
         LocalTime existingStart = existing.getStartTime();
         LocalTime existingEnd = existing.getEndTime();
-        LocalTime newStart = newPeriod.getStartTime();
-        LocalTime newEnd = newPeriod.getEndTime();
+        LocalTime newStart = newPeriod.getStartTime().toLocalTime();
+        LocalTime newEnd = newPeriod.getEndTime().toLocalTime();
 
         return !(newEnd.isBefore(existingStart) || newStart.isAfter(existingEnd));
     }

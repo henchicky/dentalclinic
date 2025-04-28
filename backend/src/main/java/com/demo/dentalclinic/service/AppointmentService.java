@@ -1,21 +1,19 @@
 package com.demo.dentalclinic.service;
 
-import com.demo.dentalclinic.dto.CreateAppointmentRequest;
+import com.demo.dentalclinic.dto.AppointmentRequest;
 import com.demo.dentalclinic.model.Appointment;
-import com.demo.dentalclinic.model.AppointmentType;
-import com.demo.dentalclinic.model.Dentist;
 import com.demo.dentalclinic.model.DentistSchedulePeriod;
 import com.demo.dentalclinic.repository.AppointmentRepository;
 import com.demo.dentalclinic.repository.DentistRepository;
-import com.demo.dentalclinic.enums.AppointmentStatus;
 import com.demo.dentalclinic.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AppointmentService {
@@ -40,7 +38,7 @@ public class AppointmentService {
         this.appointmentTypeService = appointmentTypeService;
     }
 
-    public Appointment createAppointment(CreateAppointmentRequest request) {
+    public Appointment createAppointment(AppointmentRequest request) {
         throw new UnsupportedOperationException("Not yet implemented");
         // Get appointment type
 //        AppointmentType appointmentType = appointmentTypeService.getAppointmentTypeById(request.getAppointmentTypeId())

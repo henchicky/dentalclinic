@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class CreateAppointmentRequest {
+public class AppointmentRequest {
     private Long patientId;
     private Long dentistId;
     private Long appointmentTypeId;
