@@ -1,8 +1,8 @@
 package com.demo.dentalclinic.service;
 
 import com.demo.dentalclinic.dto.AppointmentRequest;
-import com.demo.dentalclinic.model.Appointment;
-import com.demo.dentalclinic.model.DentistSchedulePeriod;
+import com.demo.dentalclinic.enums.AppointmentStatus;
+import com.demo.dentalclinic.model.*;
 import com.demo.dentalclinic.repository.AppointmentRepository;
 import com.demo.dentalclinic.repository.DentistRepository;
 import com.demo.dentalclinic.repository.PatientRepository;
@@ -29,7 +29,7 @@ public class AppointmentService {
             AppointmentRepository appointmentRepository,
             DentistRepository dentistRepository,
             DentistScheduleService dentistScheduleService,
-            AppointmentTypeService appointmentTypeService, 
+            AppointmentTypeService appointmentTypeService,
             PatientRepository patientRepository) {
         this.patientRepository = patientRepository;
         this.appointmentRepository = appointmentRepository;
@@ -39,47 +39,60 @@ public class AppointmentService {
     }
 
     public Appointment createAppointment(AppointmentRequest request) {
-        throw new UnsupportedOperationException("Not yet implemented");
-        // Get appointment type
-//        AppointmentType appointmentType = appointmentTypeService.getAppointmentTypeById(request.getAppointmentTypeId())
-//                .orElseThrow(() -> new IllegalArgumentException("Invalid appointment type ID"));
-//
-//        // Get dentist
-//        Dentist dentist = dentistRepository.findById(request.getDentistId())
-//                .orElseThrow(() -> new IllegalArgumentException("Invalid dentist ID"));
-//
-//        // Get patient
-//        Patient patient = patientRepository.findById(request.getPatientId())
-//                .orElseThrow(() -> new IllegalArgumentException("Invalid patient ID"));
-//
-//        // Create new appointment
-//        Appointment appointment = new Appointment();
-//        appointment.setAppointmentType(appointmentType);
-//        appointment.setDentist(dentist);
-//        appointment.setPatient(patient);
-//        appointment.setAppointmentTime(request.getAppointmentTime());
-//        appointment.setAppointmentStatus(AppointmentStatus.UPCOMING);
-//
-//        return appointmentRepository.save(appointment);
+        AppointmentType appointmentType = appointmentTypeService.getAppointmentTypeById(request.getAppointmentTypeId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid appointment type ID"));
+
+        // Get dentist
+        // Extract calculation of appointment time range
+        LocalDateTime appointmentStart = request.getAppointmentTime();
+        LocalDateTime appointmentEnd = appointmentStart.plusMinutes(appointmentType.getDurationMinutes());
+
+// Use Stream API to find the first available dentist
+        Dentist availableDentist = dentistRepository.findAll().stream()
+                .filter(dentist -> isDentistAvailableForAppointment(
+                        dentist.getId(),
+                        appointmentStart.toLocalDate(),
+                        appointmentStart.toLocalTime(),
+                        appointmentEnd.toLocalTime()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No available dentist"));
+
+        // Get patient
+        Patient patient = patientRepository.findByIdentificationNumber(request.getIdentificationNumber())
+                .orElseGet(() -> {
+                    Patient newPatient = new Patient();
+                    newPatient.setName(request.getName());
+                    newPatient.setIdentificationNumber(request.getIdentificationNumber());
+                    return patientRepository.save(newPatient);
+                });
+
+        // Create new appointment
+        Appointment appointment = new Appointment();
+        appointment.setAppointmentType(appointmentType);
+        appointment.setDentist(availableDentist);
+        appointment.setPatient(patient);
+        appointment.setAppointmentTime(request.getAppointmentTime());
+        appointment.setAppointmentStatus(AppointmentStatus.UPCOMING);
+
+        return appointmentRepository.save(appointment);
     }
 
     private boolean isDentistAvailableForAppointment(
             Long dentistId,
             LocalDate date,
             LocalTime startTime,
-            LocalTime endTime,
-            int requiredSlots) {
-        
+            LocalTime endTime) {
+
         // Get all available periods for the dentist on the given date
         List<DentistSchedulePeriod> availablePeriods = dentistScheduleService.getAvailablePeriods(dentistId, date);
-        
+
         // Check if the appointment time falls within any available period
         return availablePeriods.stream()
                 .anyMatch(period -> {
                     // Check if the appointment time is within the available period
-                    boolean isWithinPeriod = !startTime.isBefore(period.getStartTime()) && 
-                                          !endTime.isAfter(period.getEndTime());
-                    
+                    boolean isWithinPeriod = !startTime.isBefore(period.getStartTime()) &&
+                            !endTime.isAfter(period.getEndTime());
+
                     if (!isWithinPeriod) {
                         return false;
                     }
