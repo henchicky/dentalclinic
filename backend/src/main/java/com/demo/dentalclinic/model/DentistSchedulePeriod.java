@@ -1,9 +1,11 @@
 package com.demo.dentalclinic.model;
 
 import com.demo.dentalclinic.enums.AvailabilityType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -11,6 +13,7 @@ import java.time.LocalTime;
 @Table(name = "dentist_schedule_periods")
 @Getter
 @Setter
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class DentistSchedulePeriod {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +21,7 @@ public class DentistSchedulePeriod {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dentist_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Dentist dentist;
 
     @Column(nullable = false)

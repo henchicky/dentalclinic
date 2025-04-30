@@ -32,28 +32,28 @@ public class DentistScheduleService {
         return dentistSchedulePeriodRepository.findByDentistIdAndDateBetween(dentistId, startDate, endDate);
     }
 
-    public DentistSchedulePeriod createSchedulePeriod(DentistScheduleRequest schedulePeriod, Long dentistId) {
+    public DentistSchedulePeriod createSchedulePeriod(DentistScheduleRequest request) {
         // Validate time range
-        if (schedulePeriod.getStartTime().isAfter(schedulePeriod.getEndTime())) {
+        if (request.getStartTime().isAfter(request.getEndTime())) {
             throw new IllegalArgumentException("Start time must be before end time");
         }
 
         // Check for overlapping periods
         List<DentistSchedulePeriod> existingPeriods = dentistSchedulePeriodRepository
-            .findByDentistIdAndDate(dentistId, schedulePeriod.getStartTime().toLocalDate());
+            .findByDentistIdAndDate(request.getDentistId(), request.getStartTime().toLocalDate());
 
         for (DentistSchedulePeriod existing : existingPeriods) {
-            if (isOverlapping(existing, schedulePeriod)) {
+            if (isOverlapping(existing, request)) {
                 throw new IllegalArgumentException("Schedule period overlaps with existing period");
             }
         }
 
         // Convert DentistScheduleRequest to DentistSchedulePeriod before saving
         DentistSchedulePeriod newPeriod = new DentistSchedulePeriod();
-        newPeriod.setDentist(dentistRepository.getDentistsById(dentistId));
-        newPeriod.setStartTime(schedulePeriod.getStartTime().toLocalTime());
-        newPeriod.setEndTime(schedulePeriod.getEndTime().toLocalTime());
-        newPeriod.setType(schedulePeriod.getType());
+        newPeriod.setDentist(dentistRepository.getDentistsById(request.getDentistId()));
+        newPeriod.setStartTime(request.getStartTime().toLocalTime());
+        newPeriod.setEndTime(request.getEndTime().toLocalTime());
+        newPeriod.setType(request.getType());
 
         return dentistSchedulePeriodRepository.save(newPeriod);
     }

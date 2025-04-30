@@ -23,11 +23,9 @@ public class DentistController {
         this.dentistScheduleService = dentistScheduleService;
     }
 
-    @PostMapping("/{dentistId}/schedule")
-    public DentistSchedulePeriod createSchedulePeriod(
-            @PathVariable Long dentistId,
-            @RequestBody DentistScheduleRequest request) {
-        return dentistScheduleService.createSchedulePeriod(request, dentistId);
+    @PostMapping("/schedule")
+    public DentistSchedulePeriod createSchedulePeriod(@RequestBody DentistScheduleRequest request) {
+        return dentistScheduleService.createSchedulePeriod(request);
     }
 
     @GetMapping("/{dentistId}/schedule")
