@@ -1,4 +1,4 @@
-﻿package com.demo.dentalclinic.dto;
+package com.demo.dentalclinic.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

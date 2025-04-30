@@ -1,4 +1,4 @@
-﻿package com.demo.dentalclinic.service;
+package com.demo.dentalclinic.service;
 
 import com.demo.dentalclinic.dto.LoginRequest;
 import com.demo.dentalclinic.exception.AuthenticationException;
