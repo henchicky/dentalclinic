@@ -8,13 +8,24 @@
           </div>
         </template>
 
-        <el-form :model="appointmentForm" label-width="120px">
+        <el-form :model="appointmentForm" label-width="150px">
           <el-form-item label="Name" required>
             <el-input
               v-model="appointmentForm.patientName"
               placeholder="Enter name"
               :prefix-icon="User"
             />
+          </el-form-item>
+
+          <el-form-item label="Appointment Type" required>
+            <el-select v-model="appointmentForm.appointmentType" placeholder="Select appointment type">
+              <el-option
+                v-for="type in appointmentTypes"
+                :key="type.id"
+                :label="type.name"
+                :value="type.id"
+              />
+            </el-select>
           </el-form-item>
 
           <el-form-item label="Appointment" required>
@@ -58,16 +69,33 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, onMounted } from 'vue'
 import { User } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import axios from 'axios'
 
+interface AppointmentType {
+  id: number;
+  name: string;
+}
+
+const appointmentTypes = reactive<AppointmentType[]>([]);
+
+onMounted(async () => {
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointments/appointmentTypes`);
+    appointmentTypes.push(...response.data);
+  } catch (error) {
+    ElMessage.error('Failed to load appointment types!');
+  }
+});
+
 interface AppointmentForm {
-  patientName: string
-  appointmentDate: Date | null
-  appointmentTime: string | null
-  description: string
+  patientName: string;
+  appointmentDate: Date | null;
+  appointmentTime: string | null;
+  description: string;
+  appointmentType: number | null;
 }
 
 const appointmentForm = reactive<AppointmentForm>({
@@ -75,6 +103,7 @@ const appointmentForm = reactive<AppointmentForm>({
   appointmentDate: null,
   appointmentTime: null,
   description: '',
+  appointmentType: null,
 })
 
 // Disable past dates
@@ -101,7 +130,7 @@ const submitAppointment = async () => {
   appointmentDateTime.setMinutes(minutes)
 
   try {
-    await axios.post('http://localhost:8080/api/appointments', {
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/appointments`, {
       patientName: appointmentForm.patientName,
       appointmentTime: appointmentDateTime,
       description: appointmentForm.description,
@@ -118,6 +147,7 @@ const resetForm = () => {
   appointmentForm.appointmentDate = null
   appointmentForm.appointmentTime = null
   appointmentForm.description = ''
+  appointmentForm.appointmentType = null
 }
 
 //TODO: get available time options from db
