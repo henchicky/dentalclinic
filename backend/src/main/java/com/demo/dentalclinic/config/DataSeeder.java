@@ -107,15 +107,7 @@ public class DataSeeder {
     private void seedPatients(PatientRepository patientRepository) {
         List<Patient> patients = Arrays.asList(
                 createPatient("John Doe"),
-                createPatient("Jane Smith"),
-                createPatient("Robert Johnson"),
-                createPatient("Maria Garcia"),
-                createPatient("David Lee"),
-                createPatient("Sarah Wilson"),
-                createPatient("Michael Brown"),
-                createPatient("Emily Davis"),
-                createPatient("James Miller"),
-                createPatient("Lisa Anderson")
+                createPatient("Jane Smith")
         );
         patientRepository.saveAll(patients);
     }
@@ -175,6 +167,8 @@ public class DataSeeder {
         // Create schedule periods for 14 days (2 weeks) starting from tomorrow
         LocalDate startDate = LocalDate.now().plusDays(1);
 
+        System.out.println("Creating schedule periods for " + dentists.size() + " dentists starting from " + startDate);
+
         for (Dentist dentist : dentists) {
             for (int day = 0; day < 14; day++) {
                 LocalDate currentDate = startDate.plusDays(day);
@@ -209,7 +203,7 @@ public class DataSeeder {
                         dentist,
                         currentDate,
                         LocalTime.of(13, 0),
-                        LocalTime.of(17, 0),
+                        LocalTime.of(19, 0),
                         AvailabilityType.AVAILABLE,
                         "Afternoon shift"
                 ));

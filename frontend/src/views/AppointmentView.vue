@@ -109,12 +109,26 @@ const rules = {
 
 const appointmentFormRef = ref();
 
-// Disable past dates
+const availableDates = ref(new Set<string>());
+
+onMounted(async () => {
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointments/availableSlots`);
+    response.data.forEach((slot: { date: string }) => {
+      availableDates.value.add(slot.date);
+    });
+    console.log(availableDates.value)
+  } catch (error) {
+    console.error('Failed to fetch available slots:', error);
+  }
+});
+
 const disabledDate = (time: Date) => {
-  const endOfToday = new Date()
-  endOfToday.setHours(23, 59, 59, 999)
-  return time.getTime() < endOfToday.getTime()
-}
+  const timezoneOffset = time.getTimezoneOffset()
+  time.setMinutes(time.getMinutes() - timezoneOffset);
+  const dateString = time.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+  return !availableDates.value.has(dateString);
+};
 
 const submitAppointment = async () => {
   appointmentFormRef.value.validate(async (valid: any) => {
