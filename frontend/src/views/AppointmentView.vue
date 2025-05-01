@@ -130,7 +130,9 @@ const submitAppointment = async () => {
     // Combine date and time
     const appointmentDateTime = new Date(appointmentForm.appointmentDate ?? new Date());
     const [hours, minutes] = (appointmentForm.appointmentTime ?? '00:00').split(':').map(Number);
-    appointmentDateTime.setHours(hours);
+    appointmentDateTime.setHours(hours, minutes);
+    const timezoneOffset = appointmentDateTime.getTimezoneOffset();
+    appointmentDateTime.setMinutes(appointmentDateTime.getMinutes() - timezoneOffset); // Adjust for timezone
     appointmentDateTime.setMinutes(minutes);
 
     try {
@@ -163,6 +165,7 @@ const resetForm = () => {
   appointmentForm.appointmentTime = null
   appointmentForm.description = ''
   appointmentForm.appointmentType = null
+  appointmentFormRef.value.resetFields()
 }
 
 //TODO: get available time options from db
