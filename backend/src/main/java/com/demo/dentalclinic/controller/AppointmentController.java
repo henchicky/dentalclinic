@@ -35,7 +35,7 @@ public class AppointmentController {
         return appointmentTypeService.getAllAppointmentTypes();
     }
     
-    @GetMapping("/available-slots")
+    @GetMapping("/availableSlots")
     public List<AvailableTimeSlotDTO> getAvailableAppointmentSlots() {
         return appointmentService.findAllAvailableTimeSlots();
     }
