@@ -135,16 +135,12 @@ const submitAppointment = async () => {
       return;
     }
 
-    console.log('Submitting appointment:', appointmentForm.appointmentDate);
-    console.log('Submitting appointment:', appointmentForm.appointmentTime);
     // Combine date and time
     const appointmentDateTime = new Date(appointmentForm.appointmentDate ?? new Date());
     const [hours, minutes] = (appointmentForm.appointmentTime ?? '00:00').split(':').map(Number);
    
-    console.log('Submitting appointment:', hours, minutes);
     appointmentDateTime.setHours(hours, minutes);
-    const timezoneOffset = appointmentDateTime.getTimezoneOffset();
-    appointmentDateTime.setMinutes(appointmentDateTime.getMinutes() - timezoneOffset); // Adjust for timezone
+    offsetDate(appointmentDateTime)
     appointmentDateTime.setMinutes(minutes);
 
     console.log('Final Submitting appointment:', appointmentDateTime);
@@ -156,12 +152,13 @@ const submitAppointment = async () => {
         description: appointmentForm.description,
         appointmentType: appointmentForm.appointmentType,
       });
+      resetForm();
+      fetchAvailableSlots()
       ElNotification({
         title: 'Success',
         message: 'Appointment scheduled successfully!',
         type: 'success',
       });
-      resetForm();
     } catch (error: any) {
       console.log(error);
       ElNotification({
@@ -182,7 +179,7 @@ const resetForm = () => {
   appointmentFormRef.value.resetFields()
 }
 
-onMounted(() => {
+function fetchAppointmentTypes(){
   axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointments/appointmentTypes`)
     .then((response) => {
       appointmentTypes.push(...response.data);
@@ -195,7 +192,9 @@ onMounted(() => {
         type: 'error',
       })
     });
+}
 
+function fetchAvailableSlots() {
   axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointments/availableSlots`)
     .then((response) => {
       response.data.forEach((slot: { date: string, availableTimings: string[] }) => {
@@ -210,6 +209,10 @@ onMounted(() => {
         type: 'error',
       });
     });
+}
+onMounted(() => {
+  fetchAppointmentTypes()
+  fetchAvailableSlots()
 });
 </script>
 
