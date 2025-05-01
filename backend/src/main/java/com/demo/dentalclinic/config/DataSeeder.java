@@ -95,11 +95,11 @@ public class DataSeeder {
 
     private void seedDentists(DentistRepository dentistRepository) {
         List<Dentist> dentists = Arrays.asList(
-                createDentist("Dr. Jennifer Smith", "password123"),
-                createDentist("Dr. Michael Chen", "password123"),
-                createDentist("Dr. Sarah Johnson", "password123"),
-                createDentist("Dr. David Williams", "password123"),
-                createDentist("Dr. Emily Rodriguez", "password123")
+                createDentist("Jennifer", "Jennifer"),
+                createDentist("Michael", "Michael"),
+                createDentist("Sarah", "Sarah"),
+                createDentist("David", "David"),
+                createDentist("Emily", "Emily")
         );
         dentistRepository.saveAll(dentists);
     }
