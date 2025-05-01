@@ -58,6 +58,7 @@ public class AppointmentService {
         appointment.setPatient(patient);
         appointment.setDescription(request.getDescription());
         appointment.setAppointmentTime(request.getAppointmentTime());
+        appointment.setAppointmentEndTime(request.getAppointmentTime().plusMinutes(appointmentType.getDurationMinutes()));
         appointment.setAppointmentStatus(AppointmentStatus.UPCOMING);
 
         return appointmentRepository.save(appointment);
@@ -78,7 +79,7 @@ public class AppointmentService {
             }
 
             // Check for existing appointments that might overlap
-            List<Appointment> existingAppointments = appointmentRepository.findByDentistIdAndAppointmentTimeBetween(dentistId, date.atTime(startTime), date.atTime(endTime));
+            List<Appointment> existingAppointments = appointmentRepository.findByDentistIdAndAppointmentTimeGreaterThanAndAppointmentEndTimeLessThan(dentistId, date.atTime(startTime), date.atTime(endTime));
 
             return existingAppointments.isEmpty();
         });

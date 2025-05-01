@@ -38,6 +38,9 @@ public class Appointment {
     @Column(nullable = false)
     private LocalDateTime appointmentTime;
 
+    @Column(nullable = false)
+    private LocalDateTime appointmentEndTime;
+
     @Column
     private String description;
 
