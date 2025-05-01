@@ -24,12 +24,12 @@
           <p>Teeth whitening, veneers, and smile makeovers to enhance your natural beauty.</p>
         </div>
         <div class="service-card">
-          <div class="service-icon">🦷</div>
+          <div class="service-icon">✨</div>
           <h3>Orthodontics</h3>
           <p>Modern braces and aligners for perfectly aligned teeth and improved bite.</p>
         </div>
         <div class="service-card">
-          <div class="service-icon">🦷</div>
+          <div class="service-icon">🪥</div>
           <h3>Emergency Care</h3>
           <p>Immediate attention for dental emergencies and urgent care needs.</p>
         </div>
@@ -53,7 +53,7 @@
           </p>
         </div>
         <div class="about-image">
-          <div class="image-placeholder">Modern Dental Office</div>
+          <img src="../assets/clinic-stock.jpg" alt="Modern Dental Office" style="width: 600px; height: 400px" />
         </div>
       </div>
     </section>
