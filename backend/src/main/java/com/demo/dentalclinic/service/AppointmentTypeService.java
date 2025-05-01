@@ -41,30 +41,4 @@ public class AppointmentTypeService {
         }
         return appointmentTypeRepository.save(appointmentType);
     }
-
-//    public AppointmentType updateAppointmentType(Long id, AppointmentType appointmentTypeDetails) {
-//        return appointmentTypeRepository.findById(id)
-//            .map(existingAppointmentType -> {
-//                // Check if the new name conflicts with any other appointment type
-//                if (!existingAppointmentType.getName().equals(appointmentTypeDetails.getName()) &&
-//                    appointmentTypeRepository.findByName(appointmentTypeDetails.getName()).isPresent()) {
-//                    throw new IllegalArgumentException("Appointment type with name " + appointmentTypeDetails.getName() + " already exists");
-//                }
-//
-//                existingAppointmentType.setName(appointmentTypeDetails.getName());
-//                existingAppointmentType.setSlotCount(appointmentTypeDetails.getSlotCount());
-//                existingAppointmentType.setDurationMinutes(appointmentTypeDetails.getDurationMinutes());
-//                existingAppointmentType.setDescription(appointmentTypeDetails.getDescription());
-//
-//                return appointmentTypeRepository.save(existingAppointmentType);
-//            })
-//            .orElseThrow(() -> new IllegalArgumentException("Appointment type not found with id " + id));
-//    }
-//
-//    public void deleteAppointmentType(Long id) {
-//        if (!appointmentTypeRepository.existsById(id)) {
-//            throw new IllegalArgumentException("Appointment type not found with id " + id);
-//        }
-//        appointmentTypeRepository.deleteById(id);
-//    }
 } 

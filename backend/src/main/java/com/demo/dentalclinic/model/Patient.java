@@ -18,7 +18,4 @@ public class Patient {
 
     @Column(nullable = false)
     private String name;
-
-    @Column(nullable = false, unique = true)
-    private String identificationNumber;
 } 

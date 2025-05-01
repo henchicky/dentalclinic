@@ -33,17 +33,22 @@ public class AppointmentService {
     }
 
     public Appointment createAppointment(AppointmentRequest request) {
-        AppointmentType appointmentType = appointmentTypeService.getAppointmentTypeById(request.getAppointmentTypeId()).orElseThrow(() -> new IllegalArgumentException("Invalid appointment type ID"));
+        AppointmentType appointmentType = appointmentTypeService.getAppointmentTypeById(request.getAppointmentType())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid appointment type"));
 
         LocalDateTime appointmentStart = request.getAppointmentTime();
         LocalDateTime appointmentEnd = appointmentStart.plusMinutes(appointmentType.getDurationMinutes());
 
-        Dentist availableDentist = dentistRepository.findAll().stream().filter(dentist -> isDentistAvailableForAppointment(dentist.getId(), appointmentStart.toLocalDate(), appointmentStart.toLocalTime(), appointmentEnd.toLocalTime())).findFirst().orElseThrow(() -> new IllegalArgumentException("No available dentist"));
+        Dentist availableDentist = dentistRepository
+                .findAll()
+                .stream()
+                .filter(dentist -> isDentistAvailableForAppointment(dentist.getId(), appointmentStart.toLocalDate(), appointmentStart.toLocalTime(), appointmentEnd.toLocalTime()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No available dentist"));
 
-        Patient patient = patientRepository.findByIdentificationNumber(request.getIdentificationNumber()).orElseGet(() -> {
+        Patient patient = patientRepository.findByName(request.getName()).orElseGet(() -> {
             Patient newPatient = new Patient();
             newPatient.setName(request.getName());
-            newPatient.setIdentificationNumber(request.getIdentificationNumber());
             return patientRepository.save(newPatient);
         });
 
@@ -51,6 +56,7 @@ public class AppointmentService {
         appointment.setAppointmentType(appointmentType);
         appointment.setDentist(availableDentist);
         appointment.setPatient(patient);
+        appointment.setDescription(request.getDescription());
         appointment.setAppointmentTime(request.getAppointmentTime());
         appointment.setAppointmentStatus(AppointmentStatus.UPCOMING);
 
@@ -80,9 +86,5 @@ public class AppointmentService {
 
     public List<Appointment> getDentistAppointments(Long dentistId) {
         return appointmentRepository.findByDentistId(dentistId);
-    }
-
-    public List<Appointment> getPatientAppointments(Long patientId) {
-        return appointmentRepository.findByPatientId(patientId);
     }
 } 

@@ -34,33 +34,14 @@ public class DentistScheduleService {
             throw new IllegalArgumentException("Start time must be before end time");
         }
 
-        // Check for overlapping periods
-//        List<DentistSchedulePeriod> existingPeriods = dentistSchedulePeriodRepository
-//            .findByDentistIdAndDate(request.getDentistId(), request.getStartTime().toLocalDate());
-//
-//        for (DentistSchedulePeriod existing : existingPeriods) {
-//            if (isOverlapping(existing, request)) {
-//                throw new IllegalArgumentException("Schedule period overlaps with existing period");
-//            }
-//        }
-
         // Convert DentistScheduleRequest to DentistSchedulePeriod before saving
         DentistSchedulePeriod newPeriod = new DentistSchedulePeriod();
-//        newPeriod.setDentist(dentistRepository.getDentistsById(request.getDentistId()));
+        newPeriod.setDentist(dentistRepository.getDentistsById(request.getDentistId()));
         newPeriod.setStartTime(request.getStartTime().toLocalTime());
         newPeriod.setEndTime(request.getEndTime().toLocalTime());
         newPeriod.setType(request.getType());
 
         return dentistSchedulePeriodRepository.save(newPeriod);
-    }
-
-    private boolean isOverlapping(DentistSchedulePeriod existing, DentistScheduleRequest newPeriod) {
-        LocalTime existingStart = existing.getStartTime();
-        LocalTime existingEnd = existing.getEndTime();
-        LocalTime newStart = newPeriod.getStartTime().toLocalTime();
-        LocalTime newEnd = newPeriod.getEndTime().toLocalTime();
-
-        return !(newEnd.isBefore(existingStart) || newStart.isAfter(existingEnd));
     }
 
     public List<DentistSchedulePeriod> getAvailablePeriods(Long dentistId, LocalDate date) {

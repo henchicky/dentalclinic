@@ -5,7 +5,6 @@ import com.demo.dentalclinic.model.Appointment;
 import com.demo.dentalclinic.model.AppointmentType;
 import com.demo.dentalclinic.service.AppointmentService;
 import com.demo.dentalclinic.service.AppointmentTypeService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

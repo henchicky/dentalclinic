@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class AppointmentRequest {
     private String name;
-    private String identificationNumber;
-    private Long appointmentTypeId;
+    private String description;
+    private Long appointmentType;
     private LocalDateTime appointmentTime;
 }

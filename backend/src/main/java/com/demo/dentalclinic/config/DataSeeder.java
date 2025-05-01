@@ -106,16 +106,16 @@ public class DataSeeder {
 
     private void seedPatients(PatientRepository patientRepository) {
         List<Patient> patients = Arrays.asList(
-                createPatient("John Doe", "P001"),
-                createPatient("Jane Smith", "P002"),
-                createPatient("Robert Johnson", "P003"),
-                createPatient("Maria Garcia", "P004"),
-                createPatient("David Lee", "P005"),
-                createPatient("Sarah Wilson", "P006"),
-                createPatient("Michael Brown", "P007"),
-                createPatient("Emily Davis", "P008"),
-                createPatient("James Miller", "P009"),
-                createPatient("Lisa Anderson", "P010")
+                createPatient("John Doe"),
+                createPatient("Jane Smith"),
+                createPatient("Robert Johnson"),
+                createPatient("Maria Garcia"),
+                createPatient("David Lee"),
+                createPatient("Sarah Wilson"),
+                createPatient("Michael Brown"),
+                createPatient("Emily Davis"),
+                createPatient("James Miller"),
+                createPatient("Lisa Anderson")
         );
         patientRepository.saveAll(patients);
     }
@@ -143,10 +143,9 @@ public class DataSeeder {
         return appointmentType;
     }
 
-    private Patient createPatient(String name, String identificationNumber) {
+    private Patient createPatient(String name) {
         Patient patient = new Patient();
         patient.setName(name);
-        patient.setIdentificationNumber(identificationNumber);
         return patient;
     }
 
