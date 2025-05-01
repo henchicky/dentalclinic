@@ -24,13 +24,14 @@
               <el-col :span="12" style="padding-right: 10px;">
                 <el-form-item prop="appointmentDate">
                   <el-date-picker v-model="appointmentForm.appointmentDate" type="date" placeholder="Select date"
-                    :disabled-date="disabledDate" style="width: 100%" />
+                    :disabled-date="disabledDate" @change="" style="width: 100%" />
                 </el-form-item>
               </el-col>
               <el-col :span="12">
                 <el-form-item prop="appointmentTime">
-                  <el-time-select v-model="appointmentForm.appointmentTime" placeholder="Select time"
-                    :picker-options="timeOptions" format="hh:mm A" style="width: 100%" />
+                  <el-select v-model="appointmentForm.appointmentTime" placeholder="Select time">
+                    <el-option v-for="time in availableTimes" :key="time" :label="time" :value="time" />
+                  </el-select>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -51,10 +52,11 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, onMounted, ref } from 'vue'
-import { User } from '@element-plus/icons-vue'
+import { reactive, onMounted, ref, computed, watch } from 'vue'
+import { User, Clock } from '@element-plus/icons-vue'
 import { ElNotification } from 'element-plus'
 import axios from 'axios'
+import { format } from 'date-fns'
 
 interface AppointmentType {
   id: number;
@@ -69,15 +71,9 @@ interface AppointmentForm {
   appointmentType: number | null;
 }
 
-const timeOptions = {
-  start: '09:00',
-  end: '17:00',
-  step: '00:30',
-}
-
 const appointmentTypes = reactive<AppointmentType[]>([]);
 const appointmentFormRef = ref();
-const availableDates = ref(new Set<string>());
+const availableDates = ref<Record<string, string[]>>({});
 
 const appointmentForm = reactive<AppointmentForm>({
   patientName: '',
@@ -102,12 +98,31 @@ const rules = {
   ],
 };
 
+const availableTimes = computed(() => {
+  if (!appointmentForm.appointmentDate) return [];
+  offsetDate(appointmentForm.appointmentDate);
+  const selectedDate = appointmentForm.appointmentDate.toISOString().split('T')[0];
+  const availableTimes = availableDates.value[selectedDate] || [];
+
+  return availableTimes.map((time) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const date = new Date();
+    date.setHours(hours, minutes);
+    return format(date, 'H:mm');
+  });
+});
+
 const disabledDate = (time: Date) => {
-  const timezoneOffset = time.getTimezoneOffset()
-  time.setMinutes(time.getMinutes() - timezoneOffset);
+  offsetDate(time);
   const dateString = time.toISOString().split('T')[0];
-  return !availableDates.value.has(dateString);
+  return !availableDates.value[dateString];
 };
+
+function offsetDate(date: Date) {
+  const timezoneOffset = date.getTimezoneOffset()
+  date.setMinutes(date.getMinutes() - timezoneOffset);
+  return date;
+}
 
 const submitAppointment = async () => {
   appointmentFormRef.value.validate(async (valid: any) => {
@@ -120,13 +135,19 @@ const submitAppointment = async () => {
       return;
     }
 
+    console.log('Submitting appointment:', appointmentForm.appointmentDate);
+    console.log('Submitting appointment:', appointmentForm.appointmentTime);
     // Combine date and time
     const appointmentDateTime = new Date(appointmentForm.appointmentDate ?? new Date());
     const [hours, minutes] = (appointmentForm.appointmentTime ?? '00:00').split(':').map(Number);
+   
+    console.log('Submitting appointment:', hours, minutes);
     appointmentDateTime.setHours(hours, minutes);
     const timezoneOffset = appointmentDateTime.getTimezoneOffset();
     appointmentDateTime.setMinutes(appointmentDateTime.getMinutes() - timezoneOffset); // Adjust for timezone
     appointmentDateTime.setMinutes(minutes);
+
+    console.log('Final Submitting appointment:', appointmentDateTime);
 
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/appointments`, {
@@ -177,8 +198,8 @@ onMounted(() => {
 
   axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointments/availableSlots`)
     .then((response) => {
-      response.data.forEach((slot: { date: string, startTime: string }) => {
-        availableDates.value.add(slot.date);
+      response.data.forEach((slot: { date: string, availableTimings: string[] }) => {
+        availableDates.value[slot.date] = slot.availableTimings;
       });
     })
     .catch((error) => {
@@ -187,7 +208,7 @@ onMounted(() => {
         title: 'Error',
         message: 'Failed to load available slots!',
         type: 'error',
-      })
+      });
     });
 });
 </script>
