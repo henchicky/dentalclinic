@@ -30,7 +30,7 @@
               <el-col :span="12">
                 <el-form-item prop="appointmentTime">
                   <el-time-select v-model="appointmentForm.appointmentTime" placeholder="Select time"
-                    :picker-options="timeOptions" style="width: 100%" />
+                    :picker-options="timeOptions" format="hh:mm A" style="width: 100%" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -61,21 +61,6 @@ interface AppointmentType {
   name: string;
 }
 
-const appointmentTypes = reactive<AppointmentType[]>([]);
-
-onMounted(async () => {
-  try {
-    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointments/appointmentTypes`);
-    appointmentTypes.push(...response.data);
-  } catch (error) {
-    ElNotification({
-      title: 'Error',
-      message: 'Failed to load appointment types!',
-      type: 'error',
-    })
-  }
-});
-
 interface AppointmentForm {
   patientName: string;
   appointmentDate: Date | null;
@@ -83,6 +68,16 @@ interface AppointmentForm {
   description: string;
   appointmentType: number | null;
 }
+
+const timeOptions = {
+  start: '09:00',
+  end: '17:00',
+  step: '00:30',
+}
+
+const appointmentTypes = reactive<AppointmentType[]>([]);
+const appointmentFormRef = ref();
+const availableDates = ref(new Set<string>());
 
 const appointmentForm = reactive<AppointmentForm>({
   patientName: '',
@@ -107,26 +102,10 @@ const rules = {
   ],
 };
 
-const appointmentFormRef = ref();
-
-const availableDates = ref(new Set<string>());
-
-onMounted(async () => {
-  try {
-    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointments/availableSlots`);
-    response.data.forEach((slot: { date: string }) => {
-      availableDates.value.add(slot.date);
-    });
-    console.log(availableDates.value)
-  } catch (error) {
-    console.error('Failed to fetch available slots:', error);
-  }
-});
-
 const disabledDate = (time: Date) => {
   const timezoneOffset = time.getTimezoneOffset()
   time.setMinutes(time.getMinutes() - timezoneOffset);
-  const dateString = time.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+  const dateString = time.toISOString().split('T')[0];
   return !availableDates.value.has(dateString);
 };
 
@@ -182,12 +161,35 @@ const resetForm = () => {
   appointmentFormRef.value.resetFields()
 }
 
-//TODO: get available time options from db
-const timeOptions = {
-  start: '09:00',
-  end: '17:00',
-  step: '00:30',
-}
+onMounted(() => {
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointments/appointmentTypes`)
+    .then((response) => {
+      appointmentTypes.push(...response.data);
+    })
+    .catch((error) => {
+      console.error('Error fetching appointment types:', error);
+      ElNotification({
+        title: 'Error',
+        message: 'Failed to load appointment types!',
+        type: 'error',
+      })
+    });
+
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointments/availableSlots`)
+    .then((response) => {
+      response.data.forEach((slot: { date: string, startTime: string }) => {
+        availableDates.value.add(slot.date);
+      });
+    })
+    .catch((error) => {
+      console.error('Error fetching available slots:', error);
+      ElNotification({
+        title: 'Error',
+        message: 'Failed to load available slots!',
+        type: 'error',
+      })
+    });
+});
 </script>
 
 <style scoped>
