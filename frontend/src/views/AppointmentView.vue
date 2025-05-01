@@ -117,7 +117,8 @@ const submitAppointment = async () => {
   if (
     !appointmentForm.patientName ||
     !appointmentForm.appointmentDate ||
-    !appointmentForm.appointmentTime
+    !appointmentForm.appointmentTime ||
+    !appointmentForm.appointmentType
   ) {
     ElMessage.error('Please fill in all required fields')
     return
@@ -134,6 +135,7 @@ const submitAppointment = async () => {
       patientName: appointmentForm.patientName,
       appointmentTime: appointmentDateTime,
       description: appointmentForm.description,
+      appointmentType: appointmentForm.appointmentType
     })
     ElMessage.success('Appointment scheduled successfully!')
     resetForm()

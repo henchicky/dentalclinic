@@ -19,7 +19,6 @@ export const useAuthStore = defineStore('auth', () => {
           localStorage.setItem('isAuthenticated', 'true')
           localStorage.setItem('user', username)
           localStorage.setItem('userId', response.data)
-          console.log('User ID:', response.data)
           router.push('/schedule')
       })
       .catch((error) => {
