@@ -6,7 +6,7 @@
 
     <div class="list-view">
       <div class="appointment-filters">
-        <el-date-picker v-model="selectedDate" type="date" placeholder="Select a date" class="date-picker" />
+        <el-date-picker v-model="selectedDate" type="date" placeholder="Select a date" />
       </div>
       <div class="appointment-list">
         <div v-if="filteredAppointments.length === 0" class="no-appointments">
@@ -54,7 +54,7 @@ import { ElDatePicker } from 'element-plus'
 
 const authStore = useAuthStore()
 
-const selectedDate = ref('all')
+const selectedDate = ref(new Date())
 const selectedAppointment = ref(null)
 const username = computed(() => authStore.user)
 
@@ -81,7 +81,8 @@ const appointments = ref([
 ])
 
 const filteredAppointments = computed(() => {
-  if (selectedDate.value === 'all') {
+  console.log('Filtering appointments for date:', selectedDate.value)
+  if (!selectedDate.value) {
     return appointments.value
   }
   return appointments.value.filter((a) => a.date === selectedDate.value)

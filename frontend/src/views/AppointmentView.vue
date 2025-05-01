@@ -8,55 +8,37 @@
           </div>
         </template>
 
-        <el-form :model="appointmentForm" label-position="top">
-          <el-form-item label="Name" required>
-            <el-input
-              v-model="appointmentForm.patientName"
-              placeholder="Enter name"
-              :prefix-icon="User"
-            />
+        <el-form :model="appointmentForm" :rules="rules" ref="appointmentFormRef" label-position="top">
+          <el-form-item label="Name" prop="patientName" required>
+            <el-input v-model="appointmentForm.patientName" placeholder="Enter name" :prefix-icon="User" />
           </el-form-item>
 
-          <el-form-item label="Appointment Type" required>
+          <el-form-item label="Appointment Type" prop="appointmentType" required>
             <el-select v-model="appointmentForm.appointmentType" placeholder="Select appointment type">
-              <el-option
-                v-for="type in appointmentTypes"
-                :key="type.id"
-                :label="type.name"
-                :value="type.id"
-              />
+              <el-option v-for="type in appointmentTypes" :key="type.id" :label="type.name" :value="type.id" />
             </el-select>
           </el-form-item>
 
           <el-form-item label="Appointment" required>
             <el-row style="width: 100%">
               <el-col :span="12" style="padding-right: 10px;">
-                <el-date-picker
-                  v-model="appointmentForm.appointmentDate"
-                  type="date"
-                  placeholder="Select date"
-                  :disabled-date="disabledDate"
-                  style="width: 100%"
-                />
+                <el-form-item prop="appointmentDate">
+                  <el-date-picker v-model="appointmentForm.appointmentDate" type="date" placeholder="Select date"
+                    :disabled-date="disabledDate" style="width: 100%" />
+                </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-time-select
-                  v-model="appointmentForm.appointmentTime"
-                  placeholder="Select time"
-                  :picker-options="timeOptions"
-                  style="width: 100%"
-                />
+                <el-form-item prop="appointmentTime">
+                  <el-time-select v-model="appointmentForm.appointmentTime" placeholder="Select time"
+                    :picker-options="timeOptions" style="width: 100%" />
+                </el-form-item>
               </el-col>
             </el-row>
           </el-form-item>
 
           <el-form-item label="Description">
-            <el-input
-              v-model="appointmentForm.description"
-              type="textarea"
-              :rows="4"
-              placeholder="Enter appointment description"
-            />
+            <el-input v-model="appointmentForm.description" type="textarea" :rows="4"
+              placeholder="Enter appointment description" />
           </el-form-item>
 
           <el-form-item>
@@ -69,9 +51,9 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, onMounted } from 'vue'
+import { reactive, onMounted, ref } from 'vue'
 import { User } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
+import { ElNotification } from 'element-plus'
 import axios from 'axios'
 
 interface AppointmentType {
@@ -86,7 +68,11 @@ onMounted(async () => {
     const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointments/appointmentTypes`);
     appointmentTypes.push(...response.data);
   } catch (error) {
-    ElMessage.error('Failed to load appointment types!');
+    ElNotification({
+      title: 'Error',
+      message: 'Failed to load appointment types!',
+      type: 'error',
+    })
   }
 });
 
@@ -106,6 +92,23 @@ const appointmentForm = reactive<AppointmentForm>({
   appointmentType: null,
 })
 
+const rules = {
+  patientName: [
+    { required: true, message: 'Please enter your name', trigger: 'blur' },
+  ],
+  appointmentType: [
+    { required: true, message: 'Please select an appointment type', trigger: 'change' },
+  ],
+  appointmentDate: [
+    { required: true, message: 'Please select a date', trigger: 'change' },
+  ],
+  appointmentTime: [
+    { required: true, message: 'Please select a time', trigger: 'change' },
+  ],
+};
+
+const appointmentFormRef = ref();
+
 // Disable past dates
 const disabledDate = (time: Date) => {
   const endOfToday = new Date()
@@ -114,34 +117,44 @@ const disabledDate = (time: Date) => {
 }
 
 const submitAppointment = async () => {
-  if (
-    !appointmentForm.patientName ||
-    !appointmentForm.appointmentDate ||
-    !appointmentForm.appointmentTime ||
-    !appointmentForm.appointmentType
-  ) {
-    ElMessage.error('Please fill in all required fields')
-    return
-  }
+  appointmentFormRef.value.validate(async (valid: any) => {
+    if (!valid) {
+      ElNotification({
+        title: 'Error',
+        message: 'Please fill in all required fields',
+        type: 'error',
+      });
+      return;
+    }
 
-  // Combine date and time
-  const appointmentDateTime = new Date(appointmentForm.appointmentDate)
-  const [hours, minutes] = appointmentForm.appointmentTime.split(':').map(Number)
-  appointmentDateTime.setHours(hours)
-  appointmentDateTime.setMinutes(minutes)
+    // Combine date and time
+    const appointmentDateTime = new Date(appointmentForm.appointmentDate ?? new Date());
+    const [hours, minutes] = (appointmentForm.appointmentTime ?? '00:00').split(':').map(Number);
+    appointmentDateTime.setHours(hours);
+    appointmentDateTime.setMinutes(minutes);
 
-  try {
-    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/appointments`, {
-      patientName: appointmentForm.patientName,
-      appointmentTime: appointmentDateTime,
-      description: appointmentForm.description,
-      appointmentType: appointmentForm.appointmentType
-    })
-    ElMessage.success('Appointment scheduled successfully!')
-    resetForm()
-  } catch (error) {
-    ElMessage.error('Failed to schedule appointment!')
-  }
+    try {
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/appointments`, {
+        name: appointmentForm.patientName,
+        appointmentTime: appointmentDateTime,
+        description: appointmentForm.description,
+        appointmentType: appointmentForm.appointmentType,
+      });
+      ElNotification({
+        title: 'Success',
+        message: 'Appointment scheduled successfully!',
+        type: 'success',
+      });
+      resetForm();
+    } catch (error: any) {
+      console.log(error);
+      ElNotification({
+        title: 'Error',
+        message: error?.response?.data?.message || 'Failed to schedule appointment!',
+        type: 'error',
+      });
+    }
+  });
 }
 
 const resetForm = () => {
