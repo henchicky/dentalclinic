@@ -24,10 +24,6 @@ public class DentistScheduleService {
         this.dentistRepository = dentistRepository;
     }
 
-    public List<DentistSchedulePeriod> getDentistSchedule(Long dentistId, LocalDate date) {
-        return dentistSchedulePeriodRepository.findByDentistIdAndDate(dentistId, date);
-    }
-
     public List<DentistSchedulePeriod> getDentistScheduleBetweenDates(Long dentistId, LocalDate startDate, LocalDate endDate) {
         return dentistSchedulePeriodRepository.findByDentistIdAndDateBetween(dentistId, startDate, endDate);
     }
@@ -39,18 +35,18 @@ public class DentistScheduleService {
         }
 
         // Check for overlapping periods
-        List<DentistSchedulePeriod> existingPeriods = dentistSchedulePeriodRepository
-            .findByDentistIdAndDate(request.getDentistId(), request.getStartTime().toLocalDate());
-
-        for (DentistSchedulePeriod existing : existingPeriods) {
-            if (isOverlapping(existing, request)) {
-                throw new IllegalArgumentException("Schedule period overlaps with existing period");
-            }
-        }
+//        List<DentistSchedulePeriod> existingPeriods = dentistSchedulePeriodRepository
+//            .findByDentistIdAndDate(request.getDentistId(), request.getStartTime().toLocalDate());
+//
+//        for (DentistSchedulePeriod existing : existingPeriods) {
+//            if (isOverlapping(existing, request)) {
+//                throw new IllegalArgumentException("Schedule period overlaps with existing period");
+//            }
+//        }
 
         // Convert DentistScheduleRequest to DentistSchedulePeriod before saving
         DentistSchedulePeriod newPeriod = new DentistSchedulePeriod();
-        newPeriod.setDentist(dentistRepository.getDentistsById(request.getDentistId()));
+//        newPeriod.setDentist(dentistRepository.getDentistsById(request.getDentistId()));
         newPeriod.setStartTime(request.getStartTime().toLocalTime());
         newPeriod.setEndTime(request.getEndTime().toLocalTime());
         newPeriod.setType(request.getType());
@@ -70,10 +66,5 @@ public class DentistScheduleService {
     public List<DentistSchedulePeriod> getAvailablePeriods(Long dentistId, LocalDate date) {
         return dentistSchedulePeriodRepository.findByDentistIdAndDateAndType(
             dentistId, date, AvailabilityType.AVAILABLE);
-    }
-
-    public List<DentistSchedulePeriod> getUnavailablePeriods(Long dentistId, LocalDate date) {
-        return dentistSchedulePeriodRepository.findByDentistIdAndDateAndType(
-            dentistId, date, AvailabilityType.UNAVAILABLE);
     }
 } 

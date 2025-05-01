@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class DentistScheduleRequest {
-    private Long dentistId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private AvailabilityType type;

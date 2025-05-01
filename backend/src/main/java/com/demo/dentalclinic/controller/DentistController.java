@@ -38,32 +38,11 @@ public class DentistController {
         return dentistScheduleService.createSchedulePeriod(request);
     }
 
-    @GetMapping("/{dentistId}/schedule")
-    public List<DentistSchedulePeriod> getDentistSchedule(
-            @PathVariable Long dentistId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return dentistScheduleService.getDentistSchedule(dentistId, date);
-    }
-
     @GetMapping("/{dentistId}/schedule/range")
     public List<DentistSchedulePeriod> getDentistScheduleBetweenDates(
             @PathVariable Long dentistId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return dentistScheduleService.getDentistScheduleBetweenDates(dentistId, startDate, endDate);
-    }
-
-    @GetMapping("/{dentistId}/schedule/available")
-    public List<DentistSchedulePeriod> getAvailablePeriods(
-            @PathVariable Long dentistId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return dentistScheduleService.getAvailablePeriods(dentistId, date);
-    }
-
-    @GetMapping("/{dentistId}/schedule/unavailable")
-    public List<DentistSchedulePeriod> getUnavailablePeriods(
-            @PathVariable Long dentistId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return dentistScheduleService.getUnavailablePeriods(dentistId, date);
     }
 } 
