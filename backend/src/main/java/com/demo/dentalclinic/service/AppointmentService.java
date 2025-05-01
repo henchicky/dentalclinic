@@ -3,7 +3,6 @@ package com.demo.dentalclinic.service;
 import com.demo.dentalclinic.dto.AppointmentRequest;
 import com.demo.dentalclinic.dto.AvailableTimeSlotDTO;
 import com.demo.dentalclinic.enums.AppointmentStatus;
-import com.demo.dentalclinic.enums.AvailabilityType;
 import com.demo.dentalclinic.model.*;
 import com.demo.dentalclinic.repository.AppointmentRepository;
 import com.demo.dentalclinic.repository.DentistRepository;
@@ -14,10 +13,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class AppointmentService {
@@ -95,7 +92,8 @@ public class AppointmentService {
     }
     
     public List<AvailableTimeSlotDTO> findAllAvailableTimeSlots() {
-        List<AvailableTimeSlotDTO> allSlots = new ArrayList<>();
+        // Map to store available timings by date
+        java.util.Map<LocalDate, List<LocalTime>> availableTimesByDate = new java.util.HashMap<>();
         
         // Get current date and next 30 days
         LocalDate startDate = LocalDate.now();
@@ -106,13 +104,13 @@ public class AppointmentService {
         
         // For each date in the range
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-            LocalDate currentDate = date; // For use in lambda
-            
+            // For use in lambda
+
             // For each dentist
             for (Dentist dentist : dentists) {
                 // Get all available periods for the dentist on the current date
                 List<DentistSchedulePeriod> availablePeriods = dentistScheduleService.getAvailablePeriods(
-                        dentist.getId(), currentDate);
+                        dentist.getId(), date);
                 
                 // Skip if no available periods
                 if (availablePeriods.isEmpty()) {
@@ -120,38 +118,48 @@ public class AppointmentService {
                 }
                 
                 // Get existing appointments for this dentist on this date
-                LocalDateTime dayStart = currentDate.atStartOfDay();
-                LocalDateTime dayEnd = currentDate.plusDays(1).atStartOfDay();
+                LocalDateTime dayStart = date.atStartOfDay();
+                LocalDateTime dayEnd = date.plusDays(1).atStartOfDay();
                 List<Appointment> existingAppointments = appointmentRepository
                         .findByDentistIdAndAppointmentTimeGreaterThanAndAppointmentEndTimeLessThan(
                                 dentist.getId(), dayStart, dayEnd);
                 
-                // For each available period, generate 30-minute intervals
+                // For each available period, collect available times
                 for (DentistSchedulePeriod period : availablePeriods) {
-                    generateAvailableTimeSlotsForPeriod(
-                            dentist,
-                            currentDate,
+                    collectAvailableTimesForPeriod(
+                            date,
                             period,
                             existingAppointments,
-                            allSlots
+                            availableTimesByDate
                     );
                 }
             }
         }
         
-        // Deduplicate slots by date and time
-        // This ensures we don't show multiple slots for the same time if more than one dentist is available
-        return allSlots.stream()
-            .distinct()
-            .collect(Collectors.toList());
+        // Convert the map to a list of DTOs
+        List<AvailableTimeSlotDTO> result = new ArrayList<>();
+        for (java.util.Map.Entry<LocalDate, List<LocalTime>> entry : availableTimesByDate.entrySet()) {
+            // Sort the times for consistency
+            java.util.Collections.sort(entry.getValue());
+            
+            // Create a DTO with the date and its available times
+            result.add(new AvailableTimeSlotDTO(
+                    entry.getKey(),
+                    entry.getValue()
+            ));
+        }
+        
+        // Sort the result by date
+        result.sort(java.util.Comparator.comparing(AvailableTimeSlotDTO::getDate));
+        
+        return result;
     }
     
-    private void generateAvailableTimeSlotsForPeriod(
-            Dentist dentist,
+    private void collectAvailableTimesForPeriod(
             LocalDate date,
             DentistSchedulePeriod period,
             List<Appointment> existingAppointments,
-            List<AvailableTimeSlotDTO> availableSlots) {
+            java.util.Map<LocalDate, List<LocalTime>> availableTimesByDate) {
         
         // Start time of the period
         LocalTime currentTime = period.getStartTime();
@@ -159,12 +167,17 @@ public class AppointmentService {
         // End time of the period
         LocalTime endTime = period.getEndTime();
         
+        // Ensure we have a list for this date
+        if (!availableTimesByDate.containsKey(date)) {
+            availableTimesByDate.put(date, new ArrayList<>());
+        }
+        
         // Generate 30-minute slots until we reach the end time
-        while (currentTime.plus(30, ChronoUnit.MINUTES).isBefore(endTime) || 
-               currentTime.plus(30, ChronoUnit.MINUTES).equals(endTime)) {
+        while (currentTime.plusMinutes(30).isBefore(endTime) ||
+               currentTime.plusMinutes(30).equals(endTime)) {
             
             LocalTime slotStart = currentTime;
-            LocalTime slotEnd = currentTime.plus(30, ChronoUnit.MINUTES);
+            LocalTime slotEnd = currentTime.plusMinutes(30);
             
             // Check if this slot overlaps with any existing appointment
             boolean overlapsWithExistingAppointment = existingAppointments.stream()
@@ -177,13 +190,9 @@ public class AppointmentService {
                                 slotEnd.equals(appointmentStart) || slotStart.equals(appointmentEnd));
                     });
             
-            // If no overlap, add as available slot
-            if (!overlapsWithExistingAppointment) {
-                availableSlots.add(new AvailableTimeSlotDTO(
-                        date,
-                        slotStart,
-                        slotEnd
-                ));
+            // If no overlap and we haven't already added this time, add it to the list
+            if (!overlapsWithExistingAppointment && !availableTimesByDate.get(date).contains(slotStart)) {
+                availableTimesByDate.get(date).add(slotStart);
             }
             
             // Move to next 30-minute slot

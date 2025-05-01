@@ -6,12 +6,12 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class AvailableTimeSlotDTO {
     private LocalDate date;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private List<LocalTime> availableTimings;
 }

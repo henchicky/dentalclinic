@@ -166,9 +166,7 @@ public class DataSeeder {
 
         // Create schedule periods for 14 days (2 weeks) starting from tomorrow
         LocalDate startDate = LocalDate.now().plusDays(1);
-
-        System.out.println("Creating schedule periods for " + dentists.size() + " dentists starting from " + startDate);
-
+        
         for (Dentist dentist : dentists) {
             for (int day = 0; day < 14; day++) {
                 LocalDate currentDate = startDate.plusDays(day);
