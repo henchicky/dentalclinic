@@ -2,7 +2,7 @@
   <div class="login-container">
     <div class="login-box">
       <h2>Login</h2>
-      <el-form @submit.prevent="handleLogin" :model="{ username, password }" label-position="top">
+      <el-form label-position="top">
         <el-form-item label="Username" prop="username">
           <el-input
             id="username"
@@ -25,12 +25,9 @@
             clearable
           />
         </el-form-item>
-        <div v-if="error" class="error-message">
-          {{ error }}
-        </div>
         <el-form-item>
-          <el-button type="primary" native-type="submit" :loading="loading" style="width: 100%">
-            {{ loading ? 'Logging in...' : 'Login' }}
+          <el-button type="primary" @click="handleLogin" :loading="loading" style="width: 100%">
+            Login
           </el-button>
         </el-form-item>
       </el-form>
@@ -40,28 +37,16 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
 const authStore = useAuthStore()
-const router = useRouter()
 
 const username = ref('')
 const password = ref('')
 const loading = ref(false)
-const error = ref('')
 
 const handleLogin = async () => {
-  try {
-    loading.value = true
-    error.value = ''
-    await authStore.login(username.value, password.value)
-    router.push({ name: 'schedule' })
-  } catch {
-    error.value = 'Invalid username or password'
-  } finally {
-    loading.value = false
-  }
+  authStore.login(username.value, password.value)
 }
 </script>
 

@@ -97,6 +97,14 @@
         <router-link to="/appointment" class="cta-button">Book Now</router-link>
       </div>
     </section>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+      <div class="footer-content">
+        <p class="footer-left">&copy; 2025 Smiling Dental. All rights reserved.</p>
+        <router-link to="/schedule" class="footer-button subtle-link footer-right">Dentist's Schedule</router-link>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -296,6 +304,39 @@
 
 .cta-button:hover {
   background-color: #357abd;
+}
+
+.footer {
+  padding: 2rem 0;
+  background-color: #2c3e50;
+  color: white;
+  text-align: center;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 80px;
+}
+
+.footer-left {
+  text-align: left;
+}
+
+.footer-right {
+  text-align: right;
+}
+
+.subtle-link {
+  font-size: 0.9rem;
+  color: #cccccc;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.subtle-link:hover {
+  color: #ffffff;
 }
 
 @media (max-width: 768px) {

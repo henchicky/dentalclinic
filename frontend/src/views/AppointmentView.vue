@@ -8,7 +8,7 @@
           </div>
         </template>
 
-        <el-form :model="appointmentForm" label-width="150px">
+        <el-form :model="appointmentForm" label-position="top">
           <el-form-item label="Name" required>
             <el-input
               v-model="appointmentForm.patientName"

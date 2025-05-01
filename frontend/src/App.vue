@@ -2,11 +2,11 @@
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 import { computed } from 'vue'
+import router from './router'
 
 const authStore = useAuthStore()
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const username = computed(() => authStore.user)
-const router = useRouter()
 
 function logout() {
   authStore.logout()
@@ -22,16 +22,12 @@ function logout() {
           <img src="@/assets/dental.png" alt="Smiling Dental" class="logo-img" />
           <span class="clinic-name">Smiling Dental</span>
         </router-link>
-        <nav class="nav-links">
-          <router-link to="/appointment" class="nav-link" active-class="active-link"
-            >Appointment</router-link
-          >
-          <router-link to="/schedule" class="nav-link" active-class="active-link"
-            >Schedule</router-link
-          >
+        <nav>
           <el-dropdown v-if="isAuthenticated" class="user-dropdown">
             <span class="user-link">
-              <el-icon><User /></el-icon>
+              <el-icon>
+                <User />
+              </el-icon>
               {{ username }}
             </span>
             <template #dropdown>
@@ -67,6 +63,7 @@ function logout() {
   vertical-align: middle;
   margin-right: 1rem;
 }
+
 .logo-img {
   height: 40px;
   width: auto;
@@ -111,26 +108,6 @@ function logout() {
   font-weight: 700;
   color: #357abd;
   letter-spacing: 1px;
-}
-
-.nav-links {
-  display: flex;
-  gap: 2rem;
-}
-
-.nav-link {
-  color: #333;
-  font-size: 1rem;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s;
-  padding: 0 4px;
-  position: relative;
-}
-
-.nav-link:hover,
-.active-link {
-  color: #4a90e2;
 }
 
 .active-link::after {

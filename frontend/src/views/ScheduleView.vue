@@ -1,7 +1,7 @@
 <template>
   <div class="schedule-container">
     <div class="schedule-header">
-      <h1>My Schedule</h1>
+      <h1>{{ username }}'s Schedule</h1>
       <div class="view-toggle">
         <button :class="{ active: view === 'calendar' }" @click="view = 'calendar'">
           Calendar
@@ -94,11 +94,15 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useAuthStore } from '../stores/auth'
+
+const authStore = useAuthStore()
 
 const view = ref<'calendar' | 'list'>('calendar')
 const currentDate = ref(new Date())
 const selectedDate = ref('all')
 const selectedAppointment = ref(null)
+const username = computed(() => authStore.user)
 
 // Mock data - replace with actual API calls
 const appointments = ref([
