@@ -1,6 +1,7 @@
 package com.demo.dentalclinic.controller;
 
 import com.demo.dentalclinic.dto.AppointmentRequest;
+import com.demo.dentalclinic.dto.AvailableTimeSlotDTO;
 import com.demo.dentalclinic.model.Appointment;
 import com.demo.dentalclinic.model.AppointmentType;
 import com.demo.dentalclinic.service.AppointmentService;
@@ -32,5 +33,10 @@ public class AppointmentController {
     @GetMapping("/appointmentTypes")
     public List<AppointmentType> getAllAppointmentTypes() {
         return appointmentTypeService.getAllAppointmentTypes();
+    }
+    
+    @GetMapping("/available-slots")
+    public List<AvailableTimeSlotDTO> getAvailableAppointmentSlots() {
+        return appointmentService.findAllAvailableTimeSlots();
     }
 }

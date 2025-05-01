@@ -95,11 +95,11 @@ public class DataSeeder {
 
     private void seedDentists(DentistRepository dentistRepository) {
         List<Dentist> dentists = Arrays.asList(
-                createDentist("Jennifer", "Jennifer"),
-                createDentist("Michael", "Michael"),
-                createDentist("Sarah", "Sarah"),
-                createDentist("David", "David"),
-                createDentist("Emily", "Emily")
+                createDentist("Jennifer", "Jennifer")
+//                createDentist("Michael", "Michael"),
+//                createDentist("Sarah", "Sarah"),
+//                createDentist("David", "David"),
+//                createDentist("Emily", "Emily")
         );
         dentistRepository.saveAll(dentists);
     }
@@ -163,6 +163,7 @@ public class DataSeeder {
         appointment.setPatient(patient);
         appointment.setAppointmentType(appointmentType);
         appointment.setAppointmentTime(appointmentTime);
+        appointment.setAppointmentEndTime(appointmentTime.plusMinutes(appointmentType.getDurationMinutes()));
         appointment.setAppointmentStatus(status);
         return appointment;
     }
