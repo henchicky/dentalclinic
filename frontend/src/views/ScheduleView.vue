@@ -2,7 +2,7 @@
   <div class="schedule-container">
     <div class="schedule-header">
       <div>
-        <h1>{{ username }}'s Schedule</h1>
+        <h2>{{ username }}'s Schedule</h2>
         <p class="subtitle">Your appointments for {{ formattedDate }}</p>
       </div>
       <el-date-picker
@@ -22,21 +22,14 @@
         <el-timeline-item
           v-for="appointment in appointments"
           :key="appointment.id"
-          :timestamp="appointment.appointmentTime + ' - ' + appointment.appointmentEndTime"
+          :timestamp="appointment.appointmentTime.toString()"
           :color="getStatusColor(appointment.appointmentStatus)"
         >
-          <el-card class="appointment-card">
-            <div class="appointment-header">
-              <h3>{{ appointment.patient.name }}</h3>
-              <span class="appointment-type">
-                <el-tag :type="getTypeTagType(appointment.appointmentType.name)">
-                  {{ appointment.appointmentType.name }}
-                </el-tag>
-              </span>
-            </div>
-            <div class="appointment-body">
-              <p class="description">{{ appointment.description }}</p>
-            </div>
+          <el-card>
+            <p>Appointment Type: {{ appointment.appointmentType.name }}</p>
+            <p>Duration: {{ appointment.appointmentType.durationMinutes }}</p>
+            <p>Patient: {{ appointment.patient.name }}</p>
+            {{ appointment.description }}
             <div class="appointment-footer">
               <el-tag :type="getStatusTagType(appointment.appointmentStatus)">
                 {{ appointment.appointmentStatus }}
@@ -68,8 +61,13 @@ const appointments = ref([] as Appointment[])
 
 const formattedDate = computed(() =>
   selectedDate.value
-    ? new Date(selectedDate.value).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-    : ''
+    ? new Date(selectedDate.value).toLocaleDateString(undefined, {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : '',
 )
 
 const fetchAppointments = async () => {
@@ -79,11 +77,12 @@ const fetchAppointments = async () => {
     return
   }
 
-  axios.get<Appointment[]>(`${import.meta.env.VITE_API_BASE_URL}/dentists/${userId}/appointments`, {
-    params: {
-      date: offsetDate(selectedDate.value).toISOString().split('T')[0],
-    },
-  })
+  axios
+    .get<Appointment[]>(`${import.meta.env.VITE_API_BASE_URL}/dentists/${userId}/appointments`, {
+      params: {
+        date: offsetDate(selectedDate.value).toISOString().split('T')[0],
+      },
+    })
     .then((response) => {
       appointments.value = response.data
     })
@@ -141,8 +140,8 @@ const getTypeTagType = (type: string) => {
 <style scoped>
 .schedule-container {
   padding: 1.2rem 0.5rem;
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 850px;
+  margin: 20px auto;
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -154,7 +153,7 @@ const getTypeTagType = (type: string) => {
   align-items: flex-end;
   margin-bottom: 1.2rem;
   border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 0.7rem;
+  padding: 1rem;
 }
 
 .subtitle {
@@ -172,35 +171,7 @@ const getTypeTagType = (type: string) => {
 }
 
 .appointment-timeline {
-  padding-left: 0.2rem;
-}
-
-/* .appointment-card {
-  border: none;
-  box-shadow: 0 1px 4px rgba(64, 158, 255, 0.06);
-  border-radius: 6px;
-  padding: 0.7rem 1rem;
-} */
-
-.appointment-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.3rem;
-  gap: 0.5rem;
-}
-
-.appointment-type {
-  margin-left: 0.3rem;
-}
-
-.appointment-body {
-  margin: 0.2rem 0 0.5rem 0;
-  color: #555;
-}
-
-.description {
-  font-size: 0.98rem;
+  padding: 1rem;
 }
 
 .appointment-footer {
