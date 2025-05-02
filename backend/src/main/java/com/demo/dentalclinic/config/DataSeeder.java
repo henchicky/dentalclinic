@@ -118,7 +118,7 @@ public class DataSeeder {
                 createAppointmentType("Extraction", 45),
                 createAppointmentType("Consultation", 30),
                 createAppointmentType("Filling", 30),
-                createAppointmentType("Root Canal", 90),
+                createAppointmentType("Root Canal", 180),
                 createAppointmentType("Crown", 60),
                 createAppointmentType("Bridge", 90),
                 createAppointmentType("Denture", 60),
@@ -166,7 +166,7 @@ public class DataSeeder {
 
         // Create schedule periods for 14 days (2 weeks) starting from tomorrow
         LocalDate startDate = LocalDate.now().plusDays(1);
-        
+
         for (Dentist dentist : dentists) {
             for (int day = 0; day < 14; day++) {
                 LocalDate currentDate = startDate.plusDays(day);

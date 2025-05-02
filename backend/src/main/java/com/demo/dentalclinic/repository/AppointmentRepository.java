@@ -9,7 +9,6 @@ import java.util.List;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
-    List<Appointment> findByDentistIdAndAppointmentTimeGreaterThanAndAppointmentEndTimeLessThan(Long dentistId, LocalDateTime startTime, LocalDateTime endTime);
-
+    List<Appointment> findByDentistIdAndAppointmentTimeGreaterThanEqualAndAppointmentEndTimeLessThanEqual(Long dentistId, LocalDateTime startTime, LocalDateTime endTime);
     List<Appointment> findByDentistId(Long dentistId);
 }

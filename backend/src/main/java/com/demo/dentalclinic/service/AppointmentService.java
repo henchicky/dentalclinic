@@ -81,7 +81,7 @@ public class AppointmentService {
             }
 
             // Check for existing appointments that might overlap
-            List<Appointment> existingAppointments = appointmentRepository.findByDentistIdAndAppointmentTimeGreaterThanAndAppointmentEndTimeLessThan(dentistId, date.atTime(startTime), date.atTime(endTime));
+            List<Appointment> existingAppointments = appointmentRepository.findByDentistIdAndAppointmentTimeGreaterThanEqualAndAppointmentEndTimeLessThanEqual(dentistId, date.atTime(startTime), date.atTime(endTime));
 
             return existingAppointments.isEmpty();
         });
@@ -121,7 +121,7 @@ public class AppointmentService {
                 LocalDateTime dayStart = date.atStartOfDay();
                 LocalDateTime dayEnd = date.plusDays(1).atStartOfDay();
                 List<Appointment> existingAppointments = appointmentRepository
-                        .findByDentistIdAndAppointmentTimeGreaterThanAndAppointmentEndTimeLessThan(
+                        .findByDentistIdAndAppointmentTimeGreaterThanEqualAndAppointmentEndTimeLessThanEqual(
                                 dentist.getId(), dayStart, dayEnd);
                 
                 // For each available period, collect available times
@@ -143,10 +143,12 @@ public class AppointmentService {
             java.util.Collections.sort(entry.getValue());
             
             // Create a DTO with the date and its available times
-            result.add(new AvailableTimeSlotDTO(
-                    entry.getKey(),
-                    entry.getValue()
-            ));
+            if(!entry.getValue().isEmpty()){
+                result.add(new AvailableTimeSlotDTO(
+                        entry.getKey(),
+                        entry.getValue()
+                ));
+            }
         }
         
         // Sort the result by date
