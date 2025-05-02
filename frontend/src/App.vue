@@ -51,6 +51,9 @@ function logout() {
   padding: 0;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .el-main {
@@ -78,6 +81,9 @@ function logout() {
   height: 70px;
   display: flex;
   align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .header-content {
