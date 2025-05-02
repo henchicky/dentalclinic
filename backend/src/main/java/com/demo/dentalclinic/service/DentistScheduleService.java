@@ -1,7 +1,9 @@
 package com.demo.dentalclinic.service;
 
 import com.demo.dentalclinic.dto.DentistScheduleRequest;
+import com.demo.dentalclinic.model.Appointment;
 import com.demo.dentalclinic.model.DentistSchedulePeriod;
+import com.demo.dentalclinic.repository.AppointmentRepository;
 import com.demo.dentalclinic.repository.DentistRepository;
 import com.demo.dentalclinic.repository.DentistSchedulePeriodRepository;
 import com.demo.dentalclinic.enums.AvailabilityType;
@@ -9,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -17,15 +18,17 @@ public class DentistScheduleService {
 
     private final DentistSchedulePeriodRepository dentistSchedulePeriodRepository;
     private final DentistRepository dentistRepository;
+    private final AppointmentRepository appointmentRepository;
 
     @Autowired
-    public DentistScheduleService(DentistSchedulePeriodRepository dentistSchedulePeriodRepository, DentistRepository dentistRepository) {
+    public DentistScheduleService(DentistSchedulePeriodRepository dentistSchedulePeriodRepository, DentistRepository dentistRepository, AppointmentRepository appointmentRepository) {
         this.dentistSchedulePeriodRepository = dentistSchedulePeriodRepository;
         this.dentistRepository = dentistRepository;
+        this.appointmentRepository = appointmentRepository;
     }
 
-    public List<DentistSchedulePeriod> getDentistScheduleBetweenDates(Long dentistId, LocalDate startDate, LocalDate endDate) {
-        return dentistSchedulePeriodRepository.findByDentistIdAndDateBetween(dentistId, startDate, endDate);
+    public List<Appointment> getDentistAppointmentsByDate(Long dentistId, LocalDate date) {
+        return appointmentRepository.findByDentistIdAndAppointmentTimeGreaterThanEqualAndAppointmentEndTimeLessThanEqual(dentistId, date.atStartOfDay(), date.plusDays(1).atStartOfDay());
     }
 
     public DentistSchedulePeriod createSchedulePeriod(DentistScheduleRequest request) {

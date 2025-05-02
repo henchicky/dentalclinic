@@ -2,10 +2,10 @@ package com.demo.dentalclinic.controller;
 
 import com.demo.dentalclinic.dto.DentistScheduleRequest;
 import com.demo.dentalclinic.dto.LoginRequest;
+import com.demo.dentalclinic.model.Appointment;
 import com.demo.dentalclinic.model.DentistSchedulePeriod;
 import com.demo.dentalclinic.service.DentistScheduleService;
 import com.demo.dentalclinic.service.DentistService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -38,11 +38,10 @@ public class DentistController {
         return dentistScheduleService.createSchedulePeriod(request);
     }
 
-    @GetMapping("/{dentistId}/schedule/range")
-    public List<DentistSchedulePeriod> getDentistScheduleBetweenDates(
+    @GetMapping("/{dentistId}/appointments")
+    public List<Appointment> getDentistAppointmentsByDate(
             @PathVariable Long dentistId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return dentistScheduleService.getDentistScheduleBetweenDates(dentistId, startDate, endDate);
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return dentistScheduleService.getDentistAppointmentsByDate(dentistId, date);
     }
 } 
