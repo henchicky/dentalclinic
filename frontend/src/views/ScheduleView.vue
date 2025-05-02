@@ -1,31 +1,50 @@
 <template>
   <div class="schedule-container">
     <div class="schedule-header">
-      <h1>{{ username }}'s Schedule</h1>
+      <div>
+        <h1>{{ username }}'s Schedule</h1>
+        <p class="subtitle">Your appointments for {{ formattedDate }}</p>
+      </div>
+      <el-date-picker
+        v-model="selectedDate"
+        type="date"
+        placeholder="Select a date"
+        class="date-picker"
+        :clearable="false"
+      />
     </div>
 
     <div class="list-view">
-      <div class="appointment-filters">
-        <el-date-picker v-model="selectedDate" type="date" placeholder="Select a date" />
+      <div v-if="appointments.length === 0" class="no-appointments">
+        <el-empty description="No appointments found" />
       </div>
-      <div class="appointment-list">
-        <div v-if="appointments.length === 0" class="no-appointments">
-          No appointments found
-        </div>
-        <div v-else v-for="appointment in appointments" :key="appointment.id" class="appointment-item">
-          <div class="appointment-time">
-            {{ appointment.appointmentTime }} - {{ appointment.appointmentEndTime }}
-          </div>
-          <div class="appointment-details">
-            <h3>{{ appointment.patient.name }}</h3>
-            <p>{{ appointment.appointmentType.name }}</p>
-            <p>{{ appointment.description }}</p>
-          </div>
-          <div class="appointment-status">
-            {{ appointment.appointmentStatus }}
-          </div>
-        </div>
-      </div>
+      <el-timeline v-else class="appointment-timeline">
+        <el-timeline-item
+          v-for="appointment in appointments"
+          :key="appointment.id"
+          :timestamp="appointment.appointmentTime + ' - ' + appointment.appointmentEndTime"
+          :color="getStatusColor(appointment.appointmentStatus)"
+        >
+          <el-card class="appointment-card">
+            <div class="appointment-header">
+              <h3>{{ appointment.patient.name }}</h3>
+              <span class="appointment-type">
+                <el-tag :type="getTypeTagType(appointment.appointmentType.name)">
+                  {{ appointment.appointmentType.name }}
+                </el-tag>
+              </span>
+            </div>
+            <div class="appointment-body">
+              <p class="description">{{ appointment.description }}</p>
+            </div>
+            <div class="appointment-footer">
+              <el-tag :type="getStatusTagType(appointment.appointmentStatus)">
+                {{ appointment.appointmentStatus }}
+              </el-tag>
+            </div>
+          </el-card>
+        </el-timeline-item>
+      </el-timeline>
     </div>
   </div>
 </template>
@@ -33,16 +52,25 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
-import { ElDatePicker } from 'element-plus'
+import { ElDatePicker, ElEmpty, ElCard, ElTag, ElTimeline, ElTimelineItem } from 'element-plus'
 import axios from 'axios'
 import type { Appointment } from '@/types/Appointment'
 import { offsetDate } from '@/helper'
+import 'element-plus/es/components/avatar/style/css'
+import 'element-plus/es/components/timeline/style/css'
+import 'element-plus/es/components/timeline-item/style/css'
 
 const authStore = useAuthStore()
 
 const selectedDate = ref(new Date())
 const username = computed(() => authStore.user)
 const appointments = ref([] as Appointment[])
+
+const formattedDate = computed(() =>
+  selectedDate.value
+    ? new Date(selectedDate.value).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    : ''
+)
 
 const fetchAppointments = async () => {
   const userId = localStorage.getItem('userId')
@@ -70,112 +98,119 @@ watch(selectedDate, fetchAppointments)
 
 onMounted(fetchAppointments)
 
-const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
+const getStatusTagType = (status: string) => {
+  switch (status) {
+    case 'CANCELLED':
+      return 'danger'
+    case 'UPCOMING':
+      return 'success'
+    case 'COMPLETED':
+      return 'info'
+    default:
+      return 'warning'
+  }
 }
 
-const formatTime = (time: string) => {
-  return new Date(`2000-01-01T${time}`).toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-  })
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'CANCELLED':
+      return '#f56c6c'
+    case 'UPCOMING':
+      return '#67c23a'
+    case 'COMPLETED':
+      return '#409eff'
+    default:
+      return '#e6a23c'
+  }
+}
+
+const getTypeTagType = (type: string) => {
+  switch (type.toLowerCase()) {
+    case 'consultation':
+      return 'info'
+    case 'surgery':
+      return 'danger'
+    case 'cleaning':
+      return 'success'
+    default:
+      return 'primary'
+  }
 }
 </script>
 
 <style scoped>
 .schedule-container {
-  padding: 2rem;
-  max-width: 1200px;
+  padding: 1.2rem 0.5rem;
+  max-width: 800px;
   margin: 0 auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .schedule-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
+  align-items: flex-end;
+  margin-bottom: 1.2rem;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 0.7rem;
 }
 
-.list-view {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
-}
-
-.appointment-filters {
-  margin-bottom: 1rem;
+.subtitle {
+  color: #888;
+  font-size: 0.95rem;
+  margin-top: 0.15rem;
 }
 
 .date-picker {
   width: 200px;
 }
 
-.appointment-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.list-view {
+  margin-top: 1.2rem;
 }
 
-.appointment-item {
+.appointment-timeline {
+  padding-left: 0.2rem;
+}
+
+/* .appointment-card {
+  border: none;
+  box-shadow: 0 1px 4px rgba(64, 158, 255, 0.06);
+  border-radius: 6px;
+  padding: 0.7rem 1rem;
+} */
+
+.appointment-header {
   display: flex;
   align-items: center;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+  gap: 0.5rem;
 }
 
-.appointment-time {
-  width: 150px;
-  font-weight: bold;
+.appointment-type {
+  margin-left: 0.3rem;
 }
 
-.appointment-details {
-  flex: 1;
+.appointment-body {
+  margin: 0.2rem 0 0.5rem 0;
+  color: #555;
 }
 
-.appointment-status {
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
+.description {
+  font-size: 0.98rem;
+}
+
+.appointment-footer {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .no-appointments {
   text-align: center;
-  padding: 2rem;
-  color: #666;
-}
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  max-width: 500px;
-  width: 90%;
-}
-
-.appointment-info {
-  margin: 1rem 0;
-}
-
-.appointment-info p {
-  margin: 0.5rem 0;
+  padding: 1.2rem 0;
+  color: #aaa;
 }
 </style>
