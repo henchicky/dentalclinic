@@ -24,7 +24,7 @@
               <el-col :span="12" style="padding-right: 10px;">
                 <el-form-item prop="appointmentDate">
                   <el-date-picker v-model="appointmentForm.appointmentDate" type="date" placeholder="Select date"
-                    :disabled-date="disabledDate" @change="" style="width: 100%" />
+                    :disabled-date="disabledDate" style="width: 100%"/>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 import { reactive, onMounted, ref, computed, watch } from 'vue'
-import { User, Clock } from '@element-plus/icons-vue'
+import { User } from '@element-plus/icons-vue'
 import { ElNotification } from 'element-plus'
 import axios from 'axios'
 import { format } from 'date-fns'
@@ -112,11 +112,11 @@ const availableTimes = computed(() => {
   });
 });
 
-const disabledDate = (time: Date) => {
-  offsetDate(time);
-  const dateString = time.toISOString().split('T')[0];
-  return !availableDates.value[dateString];
-};
+function disabledDate(time: Date) {
+  offsetDate(time)
+  const dateString = time.toISOString().split('T')[0]
+  return !availableDates.value[dateString]
+}
 
 function offsetDate(date: Date) {
   const timezoneOffset = date.getTimezoneOffset()
@@ -142,8 +142,6 @@ const submitAppointment = async () => {
     appointmentDateTime.setHours(hours, minutes);
     offsetDate(appointmentDateTime)
     appointmentDateTime.setMinutes(minutes);
-
-    console.log('Final Submitting appointment:', appointmentDateTime);
 
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/appointments`, {
@@ -197,6 +195,7 @@ function fetchAppointmentTypes(){
 function fetchAvailableSlots() {
   axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointments/availableSlots`)
     .then((response) => {
+      availableDates.value = {}
       response.data.forEach((slot: { date: string, availableTimings: string[] }) => {
         availableDates.value[slot.date] = slot.availableTimings;
       });
