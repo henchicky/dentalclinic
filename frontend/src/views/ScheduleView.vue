@@ -9,84 +9,65 @@
         <el-date-picker v-model="selectedDate" type="date" placeholder="Select a date" />
       </div>
       <div class="appointment-list">
-        <div v-if="filteredAppointments.length === 0" class="no-appointments">
+        <div v-if="appointments.length === 0" class="no-appointments">
           No appointments found
         </div>
-        <div v-else v-for="appointment in filteredAppointments" :key="appointment.id" class="appointment-item">
+        <div v-else v-for="appointment in appointments" :key="appointment.id" class="appointment-item">
           <div class="appointment-time">
-            {{ formatTime(appointment.startTime) }} - {{ formatTime(appointment.endTime) }}
+            {{ appointment.appointmentTime }} - {{ appointment.appointmentEndTime }}
           </div>
           <div class="appointment-details">
-            <h3>{{ appointment.patientName }}</h3>
-            <p>{{ appointment.procedure }}</p>
+            <h3>{{ appointment.patient.name }}</h3>
+            <p>{{ appointment.appointmentType.name }}</p>
+            <p>{{ appointment.description }}</p>
           </div>
-          <div class="appointment-status" :class="appointment.status">
-            {{ appointment.status }}
+          <div class="appointment-status">
+            {{ appointment.appointmentStatus }}
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Appointment Details Modal -->
-    <div v-if="selectedAppointment" class="modal">
-      <div class="modal-content">
-        <h2>Appointment Details</h2>
-        <div class="appointment-info">
-          <p><strong>Patient:</strong> {{ selectedAppointment.patientName }}</p>
-          <p><strong>Date:</strong> {{ formatDate(selectedAppointment.date) }}</p>
-          <p>
-            <strong>Time:</strong> {{ formatTime(selectedAppointment.startTime) }} -
-            {{ formatTime(selectedAppointment.endTime) }}
-          </p>
-          <p><strong>Procedure:</strong> {{ selectedAppointment.procedure }}</p>
-          <p><strong>Status:</strong> {{ selectedAppointment.status }}</p>
-        </div>
-        <button @click="selectedAppointment = null">Close</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { ElDatePicker } from 'element-plus'
+import axios from 'axios'
+import type { Appointment } from '@/types/Appointment'
 
 const authStore = useAuthStore()
 
 const selectedDate = ref(new Date())
-const selectedAppointment = ref(null)
 const username = computed(() => authStore.user)
+const appointments = ref([] as Appointment[])
 
-// Mock data - replace with actual API calls
-const appointments = ref([
-  {
-    id: 1,
-    patientName: 'John Doe',
-    date: '2024-03-15',
-    startTime: '09:00',
-    endTime: '10:00',
-    procedure: 'Regular Checkup',
-    status: 'confirmed',
-  },
-  {
-    id: 2,
-    patientName: 'Jane Smith',
-    date: '2024-03-15',
-    startTime: '14:00',
-    endTime: '15:00',
-    procedure: 'Teeth Cleaning',
-    status: 'pending',
-  },
-])
-
-const filteredAppointments = computed(() => {
-  console.log('Filtering appointments for date:', selectedDate.value)
-  if (!selectedDate.value) {
-    return appointments.value
+const fetchAppointments = async () => {
+  const userId = localStorage.getItem('userId')
+  if (!userId || !selectedDate.value) {
+    appointments.value = []
+    return
   }
-  return appointments.value.filter((a) => a.date === selectedDate.value)
-})
+
+  axios.get<Appointment[]>(`${import.meta.env.VITE_API_BASE_URL}/dentists/${userId}/appointments`, {
+    params: {
+      date: selectedDate.value.toISOString().split('T')[0],
+    },
+  })
+    .then((response) => {
+      appointments.value = response.data
+    })
+    .catch((error) => {
+      console.error('Error fetching appointments:', error)
+      appointments.value = []
+    })
+}
+
+// Watch for changes in selectedDate and fetch appointments
+watch(selectedDate, fetchAppointments)
+
+onMounted(fetchAppointments)
 
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString('en-US', {
