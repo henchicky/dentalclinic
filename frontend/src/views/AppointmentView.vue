@@ -57,6 +57,7 @@ import { User } from '@element-plus/icons-vue'
 import { ElNotification } from 'element-plus'
 import axios from 'axios'
 import { format } from 'date-fns'
+import { offsetDate } from '@/helper'
 
 interface AppointmentType {
   id: number;
@@ -116,12 +117,6 @@ function disabledDate(time: Date) {
   offsetDate(time)
   const dateString = time.toISOString().split('T')[0]
   return !availableDates.value[dateString]
-}
-
-function offsetDate(date: Date) {
-  const timezoneOffset = date.getTimezoneOffset()
-  date.setMinutes(date.getMinutes() - timezoneOffset);
-  return date;
 }
 
 const submitAppointment = async () => {

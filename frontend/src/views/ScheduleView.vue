@@ -36,6 +36,7 @@ import { useAuthStore } from '../stores/auth'
 import { ElDatePicker } from 'element-plus'
 import axios from 'axios'
 import type { Appointment } from '@/types/Appointment'
+import { offsetDate } from '@/helper'
 
 const authStore = useAuthStore()
 
@@ -52,7 +53,7 @@ const fetchAppointments = async () => {
 
   axios.get<Appointment[]>(`${import.meta.env.VITE_API_BASE_URL}/dentists/${userId}/appointments`, {
     params: {
-      date: selectedDate.value.toISOString().split('T')[0],
+      date: offsetDate(selectedDate.value).toISOString().split('T')[0],
     },
   })
     .then((response) => {
