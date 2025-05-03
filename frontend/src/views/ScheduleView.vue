@@ -136,19 +136,20 @@ const getAppointmentStyle = (appointment: Appointment) => {
   // Adjust calculations to be based on 12-hour window (8am-8pm = 720 minutes)
   const startOfDay = 8 * 60 // 8 AM in minutes
   const totalMinutes = 12 * 60 // 12 hours in minutes
-  const topPercentage = ((minutes - startOfDay) / totalMinutes) * 100
-  const heightPercentage = (duration / totalMinutes) * 100
+  
+  const top = 10 + ((minutes - startOfDay) / totalMinutes) * 930
+  const height = (duration / totalMinutes) * 900
   
   return {
-    top: `${topPercentage}%`,
-    height: `${heightPercentage}%`
+    top: `${top}px`, // Add header offset to top position
+    height: `${height}px`
   }
 }
 </script>
 
 <style scoped>
 .schedule-container {
-  padding: 1.2rem 0.5rem;
+  padding: 0rem 0.5rem;
   max-width: 1000px;
   margin: 20px auto;
   background: #fff;
@@ -160,7 +161,7 @@ const getAppointmentStyle = (appointment: Appointment) => {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 3rem;
+  margin-bottom: 1.2rem;
   border-bottom: 1px solid #f0f0f0;
   padding: 1rem;
 }
@@ -174,36 +175,23 @@ const getAppointmentStyle = (appointment: Appointment) => {
 
 .schedule-grid {
   display: flex;
-  height: 720px;
+  height: 1000px;
   position: relative;
   margin: 0 1rem;
 }
 
 .timeline {
-  width: 60px;
   border-right: 1px solid #eee;
   position: relative;
+  padding-right: 3px;
 }
 
 .hour-marker {
-  position: absolute;
   font-size: 0.8rem;
   color: #999;
-  transform: translateY(-50%);
   padding-right: 8px;
   text-align: right;
   width: 100%;
-  height: 2px;
-}
-
-.hour-marker::after {
-  content: '';
-  position: absolute;
-  right: -1px;
-  top: 50%;
-  width: 5px;
-  height: 1px;
-  background: #eee;
 }
 
 .appointments-container {
@@ -233,7 +221,7 @@ const getAppointmentStyle = (appointment: Appointment) => {
   right: 0;
   background: #ffffff;
   border-left: 4px solid #4CAF50;
-  padding: 8px;
+  padding: 1px 8px;
   margin-right: 8px;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -245,6 +233,7 @@ const getAppointmentStyle = (appointment: Appointment) => {
 .appointment-card:hover {
   transform: translateX(2px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  z-index: 2;
 }
 
 .appointment-content {
@@ -259,14 +248,14 @@ const getAppointmentStyle = (appointment: Appointment) => {
   font-size: 0.9rem;
   font-weight: 600;
   color: #2c3e50;
-  margin-bottom: 4px;
+  margin-bottom: 0px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .appointment-details {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #666;
   display: flex;
   align-items: center;
