@@ -107,7 +107,7 @@ public class DataSeeder {
                 } catch (Exception e) {
                     // If there's an error (like no dentist available), move the time forward by 1 hour
                     LocalDateTime failedTime = request.getAppointmentTime();
-                    LocalDateTime newTime = failedTime.plusHours(1);
+                    LocalDateTime newTime = failedTime.plusMinutes(15);
                     
                     System.out.println("Failed to create appointment at " + failedTime + ": " + e.getMessage());
                     System.out.println("Retrying at " + newTime);
@@ -186,8 +186,6 @@ public class DataSeeder {
         return dentist;
     }
 
-    // createAppointment method removed as we now use AppointmentService.createAppointment
-
     private void seedDentistSchedulePeriods(DentistRepository dentistRepository, DentistSchedulePeriodRepository dentistSchedulePeriodRepository) {
         List<Dentist> dentists = dentistRepository.findAll();
         List<DentistSchedulePeriod> schedulePeriods = new ArrayList<>();
@@ -198,11 +196,6 @@ public class DataSeeder {
         for (Dentist dentist : dentists) {
             for (int day = 0; day < 14; day++) {
                 LocalDate currentDate = startDate.plusDays(day);
-
-                // Skip weekends (Saturday and Sunday)
-//                if (currentDate.getDayOfWeek().getValue() >= 6) {
-//                    continue;
-//                }
 
                 // Morning availability (9:00 AM - 12:00 PM)
                 schedulePeriods.add(createSchedulePeriod(
@@ -224,16 +217,6 @@ public class DataSeeder {
                         "Lunch break"
                 ));
 
-                // Afternoon availability (1:00 PM - 5:00 PM)
-                schedulePeriods.add(createSchedulePeriod(
-                        dentist,
-                        currentDate,
-                        LocalTime.of(13, 0),
-                        LocalTime.of(20, 0),
-                        AvailabilityType.AVAILABLE,
-                        "Afternoon shift"
-                ));
-
                 // Add some random unavailable periods for meetings, etc.
                 if (day % 3 == 0) {
                     schedulePeriods.add(createSchedulePeriod(
@@ -243,6 +226,33 @@ public class DataSeeder {
                             LocalTime.of(15, 0),
                             AvailabilityType.UNAVAILABLE,
                             "Staff meeting"
+                    ));
+                    schedulePeriods.add(createSchedulePeriod(
+                            dentist,
+                            currentDate,
+                            LocalTime.of(13, 0),
+                            LocalTime.of(14, 0),
+                            AvailabilityType.AVAILABLE,
+                            "Afternoon shift"
+                    ));
+                    schedulePeriods.add(createSchedulePeriod(
+                            dentist,
+                            currentDate,
+                            LocalTime.of(15, 0),
+                            LocalTime.of(20, 0),
+                            AvailabilityType.AVAILABLE,
+                            "Afternoon shift"
+                    ));
+                }
+                else {
+                    // Afternoon availability (1:00 PM - 5:00 PM)
+                    schedulePeriods.add(createSchedulePeriod(
+                            dentist,
+                            currentDate,
+                            LocalTime.of(13, 0),
+                            LocalTime.of(20, 0),
+                            AvailabilityType.AVAILABLE,
+                            "Afternoon shift"
                     ));
                 }
             }
