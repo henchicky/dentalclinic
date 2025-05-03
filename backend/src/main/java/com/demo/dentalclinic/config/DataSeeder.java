@@ -1,5 +1,7 @@
 package com.demo.dentalclinic.config;
 
+import com.demo.dentalclinic.dto.AppointmentRequest;
+import com.demo.dentalclinic.dto.AppointmentRequest;
 import com.demo.dentalclinic.enums.AppointmentStatus;
 import com.demo.dentalclinic.enums.AvailabilityType;
 import com.demo.dentalclinic.model.Appointment;
@@ -12,6 +14,9 @@ import com.demo.dentalclinic.repository.AppointmentTypeRepository;
 import com.demo.dentalclinic.repository.DentistRepository;
 import com.demo.dentalclinic.repository.DentistSchedulePeriodRepository;
 import com.demo.dentalclinic.repository.PatientRepository;
+import com.demo.dentalclinic.service.AppointmentService;
+import com.demo.dentalclinic.service.AppointmentService;
+import com.demo.dentalclinic.service.AppointmentTypeService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,8 +38,9 @@ public class DataSeeder {
             DentistRepository dentistRepository,
             AppointmentTypeRepository appointmentTypeRepository,
             PatientRepository patientRepository,
-            AppointmentRepository appointmentRepository,
-            DentistSchedulePeriodRepository dentistSchedulePeriodRepository
+            AppointmentTypeService appointmentTypeService,
+            DentistSchedulePeriodRepository dentistSchedulePeriodRepository,
+            AppointmentService appointmentService
     ) {
         return _ -> {
             seedAppointmentTypes(appointmentTypeRepository);
@@ -43,54 +49,62 @@ public class DataSeeder {
 
             seedDentists(dentistRepository);
 
-            seedAppointments(dentistRepository, appointmentTypeRepository, patientRepository, appointmentRepository);
-
             seedDentistSchedulePeriods(dentistRepository, dentistSchedulePeriodRepository);
+
+            seedAppointments(appointmentTypeService, appointmentService);
         };
     }
 
-    private void seedAppointments(DentistRepository dentistRepository, AppointmentTypeRepository appointmentTypeRepository, PatientRepository patientRepository, AppointmentRepository appointmentRepository) {
-        // Create some appointments for the next 7 days
-        List<Appointment> appointments = new ArrayList<>();
-
-        // Get saved entities from repositories
-        List<Dentist> savedDentists = dentistRepository.findAll();
-        List<Patient> savedPatients = patientRepository.findAll();
-        List<AppointmentType> savedAppointmentTypes = appointmentTypeRepository.findAll();
-
+    private void seedAppointments(AppointmentTypeService appointmentTypeService, AppointmentService appointmentService) {
+        // Inject required services
+        PatientRepository patientRepository = appointmentService.getPatientRepository();
+        
+        // Get all appointment types and patients
+        List<AppointmentType> appointmentTypes = appointmentTypeService.getAllAppointmentTypes();
+        List<Patient> patients = patientRepository.findAll();
+        
+        if (appointmentTypes.isEmpty() || patients.isEmpty()) {
+            System.out.println("Cannot seed appointments: No appointment types or patients found");
+            return;
+        }
+        
         // Create some upcoming appointments
         LocalDateTime startDateTime = LocalDateTime.now().plusDays(1).withHour(9).withMinute(0).withSecond(0).withNano(0);
+        
+        // Track the current appointment time, starting from tomorrow at 9 AM
+        LocalDateTime currentDateTime = startDateTime;
+        int dayCounter = 0;
+        
+        // Create 15 sample appointments
+        for (int i = 0; i < 15; i++) {
+            Patient patient = patients.get(i % patients.size());
+            AppointmentType appointmentType = appointmentTypes.get(i % appointmentTypes.size());
+            
+            // If we've added appointments pushing past 5 PM, move to the next day
+            if (currentDateTime.getHour() >= 19) {
+                dayCounter++;
+                currentDateTime = startDateTime.plusDays(dayCounter).withHour(9).withMinute(0);
+            }
+            
+            // Create appointment request
+            AppointmentRequest request = new AppointmentRequest();
+            request.setName(patient.getName());
+            request.setDescription("Seeded appointment #" + (i + 1));
+            request.setAppointmentType(appointmentType.getId());
+            request.setAppointmentTime(currentDateTime);
 
-        // Create 20 sample appointments
-        for (int i = 0; i < 20; i++) {
-            Dentist dentist = savedDentists.get(i % savedDentists.size());
-            Patient patient = savedPatients.get(i % savedPatients.size());
-            AppointmentType appointmentType = savedAppointmentTypes.get(i % savedAppointmentTypes.size());
-
-            // Create appointment at different times
-            LocalDateTime appointmentTime = startDateTime.plusHours(i % 8).plusDays(i / 8);
-
-            appointments.add(createAppointment(dentist, patient, appointmentType, appointmentTime, AppointmentStatus.UPCOMING));
+            try {
+                // Create the appointment using the service
+                Appointment appointment = appointmentService.createAppointment(request);
+                
+                // Move to the next time slot based on appointment duration
+                currentDateTime = currentDateTime.plusMinutes(appointmentType.getDurationMinutes());
+            } catch (Exception e) {
+                // If there's an error (like no dentist available), move the time forward and try again
+                System.out.println("Failed to create appointment at " + currentDateTime + ": " + e.getMessage());
+                currentDateTime = currentDateTime.plusHours(1);
+            }
         }
-
-        // Create a few past appointments (some completed, some cancelled)
-        LocalDateTime pastStartDateTime = LocalDateTime.now().minusDays(10).withHour(10).withMinute(0).withSecond(0).withNano(0);
-
-        for (int i = 0; i < 10; i++) {
-            Dentist dentist = savedDentists.get(i % savedDentists.size());
-            Patient patient = savedPatients.get((i + 3) % savedPatients.size());
-            AppointmentType appointmentType = savedAppointmentTypes.get((i + 2) % savedAppointmentTypes.size());
-
-            // Create appointment at different past times
-            LocalDateTime appointmentTime = pastStartDateTime.plusHours(i % 7).plusDays(i / 7);
-
-            // Alternate between COMPLETED and CANCELLED status
-            AppointmentStatus status = (i % 2 == 0) ? AppointmentStatus.COMPLETED : AppointmentStatus.CANCELLED;
-
-            appointments.add(createAppointment(dentist, patient, appointmentType, appointmentTime, status));
-        }
-
-        appointmentRepository.saveAll(appointments);
     }
 
     private void seedDentists(DentistRepository dentistRepository) {
@@ -118,7 +132,7 @@ public class DataSeeder {
                 createAppointmentType("Extraction", 45),
                 createAppointmentType("Consultation", 30),
                 createAppointmentType("Filling", 30),
-                createAppointmentType("Root Canal", 180),
+                createAppointmentType("Root Canal", 90),
                 createAppointmentType("Crown", 60),
                 createAppointmentType("Bridge", 90),
                 createAppointmentType("Denture", 60),
@@ -148,17 +162,7 @@ public class DataSeeder {
         return dentist;
     }
 
-    private Appointment createAppointment(Dentist dentist, Patient patient, AppointmentType appointmentType,
-                                          LocalDateTime appointmentTime, AppointmentStatus status) {
-        Appointment appointment = new Appointment();
-        appointment.setDentist(dentist);
-        appointment.setPatient(patient);
-        appointment.setAppointmentType(appointmentType);
-        appointment.setAppointmentTime(appointmentTime);
-        appointment.setAppointmentEndTime(appointmentTime.plusMinutes(appointmentType.getDurationMinutes()));
-        appointment.setAppointmentStatus(status);
-        return appointment;
-    }
+    // createAppointment method removed as we now use AppointmentService.createAppointment
 
     private void seedDentistSchedulePeriods(DentistRepository dentistRepository, DentistSchedulePeriodRepository dentistSchedulePeriodRepository) {
         List<Dentist> dentists = dentistRepository.findAll();
@@ -172,9 +176,9 @@ public class DataSeeder {
                 LocalDate currentDate = startDate.plusDays(day);
 
                 // Skip weekends (Saturday and Sunday)
-                if (currentDate.getDayOfWeek().getValue() >= 6) {
-                    continue;
-                }
+//                if (currentDate.getDayOfWeek().getValue() >= 6) {
+//                    continue;
+//                }
 
                 // Morning availability (9:00 AM - 12:00 PM)
                 schedulePeriods.add(createSchedulePeriod(
