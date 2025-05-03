@@ -23,13 +23,13 @@
       <div class="appointments-container">
         <div class="current-time-line" :style="currentTimeStyle"></div>
         
-        <div v-if="appointments.length === 0" class="no-appointments">
+        <div v-if="schedules.length === 0" class="no-appointments">
           <el-empty description="No appointments found" />
         </div>
         
         <div v-else class="appointment-cards">
           <div
-            v-for="appointment in appointments"
+            v-for="appointment in schedules"
             :key="appointment.id"
             class="appointment-card"
             :style="getAppointmentStyle(appointment)"
@@ -39,7 +39,7 @@
                 {{ appointment.appointmentType.name }} · {{ appointment.appointmentType.durationMinutes }}min
               </div>
               <div class="appointment-details">
-                {{ formatTime(appointment.appointmentTime) }} - {{ formatTime(appointment.appointmentEndTime) }} {{ appointment.appointmentStatus == 'DENTIST_UNAVAILABLE' ? '' : '·' + appointment.patient.name + '·' + appointment.description }}
+                {{ formatTime(appointment.appointmentTime) }} - {{ formatTime(appointment.appointmentEndTime) }} {{ appointment.appointmentStatus == 'DENTIST_UNAVAILABLE' ? '' : ' · ' + appointment.patient.name + ' · ' + appointment.description }}
               </div>
             </div>
           </div>
@@ -62,6 +62,14 @@ const authStore = useAuthStore()
 const selectedDate = ref(new Date())
 const username = computed(() => authStore.user)
 const appointments = ref([] as Appointment[])
+const unavailability = ref([] as Appointment[])
+const schedules = computed(() => {
+  let array = appointments.value.concat(unavailability.value)
+  console.log("appointments" , appointments.value)
+  console.log("unavailability", unavailability.value)
+  console.log(array)
+  return array.sort((a, b) => new Date(a.appointmentTime).getTime() - new Date(b.appointmentTime).getTime())
+})
 
 const formattedDate = computed(() =>
   selectedDate.value
@@ -75,6 +83,7 @@ const formattedDate = computed(() =>
 )
 
 const fetchAppointments = async () => {
+  appointments.value = []
   const userId = localStorage.getItem('userId')
   if (!userId || !selectedDate.value) {
     appointments.value = []
@@ -97,9 +106,10 @@ const fetchAppointments = async () => {
 }
 
 const fetchUnavailablePeriods = async () => {
+  unavailability.value = []
   const userId = localStorage.getItem('userId')
   if (!userId || !selectedDate.value) {
-    appointments.value = []
+    unavailability.value = []
     return
   }
 
@@ -110,23 +120,22 @@ const fetchUnavailablePeriods = async () => {
       },
     })
     .then((response) => {
-      appointments.value.push(...response.data.map((unavailability) => ({
-        id: 100000 + unavailability.id,
-        appointmentTime: unavailability.startTime,
-        appointmentEndTime: unavailability.endTime,
+      unavailability.value.push(...response.data.map((data) => ({
+        id: 100000 + data.id,
+        appointmentTime: data.startTime,
+        appointmentEndTime: data.endTime,
         appointmentType: {
-          name: unavailability.description,
-          durationMinutes: (new Date(unavailability.endTime).getTime() - new Date(unavailability.startTime).getTime()) / 60000,
+          name: data.description,
+          durationMinutes: (new Date(data.endTime).getTime() - new Date(data.startTime).getTime()) / 60000,
         },
         patient: { name: '' },
         description: '',
         appointmentStatus: 'DENTIST_UNAVAILABLE'
       })))
-      appointments.value.sort((a, b) => new Date(a.appointmentTime).getTime() - new Date(b.appointmentTime).getTime())
     })
     .catch((error) => {
       console.error('Error fetching unavailbity period:', error)
-      appointments.value = []
+      unavailability.value = []
     })
 }
 
@@ -179,9 +188,9 @@ const getAppointmentStyle = (appointment: Appointment) => {
   
   const top = 5 + ((minutes - startOfDay) / totalMinutes) * 930
   const height = (duration / totalMinutes) * 900
-  var color = '#4CAF50' // Default color for appointments
+  var color = '#4CAF50'
   if (appointment.appointmentStatus === 'DENTIST_UNAVAILABLE') {
-    color = '#FF9800' // Color for unavailable periods
+    color = '#FF9800'
   }
   return {
     top: `${top}px`, // Add header offset to top position
