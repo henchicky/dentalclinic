@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, onMounted, ref, computed, watch } from 'vue'
+import { reactive, onMounted, ref, computed } from 'vue'
 import { User } from '@element-plus/icons-vue'
 import { ElNotification } from 'element-plus'
 import axios from 'axios'
@@ -96,7 +96,7 @@ const rules = {
   ],
   appointmentTime: [
     { required: true, message: 'Please select a time', trigger: 'change' },
-  ],
+  ]
 };
 
 const availableTimes = computed(() => {
@@ -116,7 +116,10 @@ const availableTimes = computed(() => {
 function disabledDate(time: Date) {
   offsetDate(time)
   const dateString = time.toISOString().split('T')[0]
-  return !availableDates.value[dateString]
+  var currentDate = new Date()
+  currentDate.setDate(currentDate.getDate() + 1);
+
+  return !availableDates.value[dateString] || time < currentDate
 }
 
 const submitAppointment = async () => {
