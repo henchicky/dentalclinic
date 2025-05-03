@@ -39,7 +39,7 @@
                 {{ appointment.appointmentType.name }} · {{ appointment.appointmentType.durationMinutes }}min
               </div>
               <div class="appointment-details">
-                {{ formatTime(appointment.appointmentTime) }} - {{ formatTime(appointment.appointmentEndTime) }} · {{ appointment.patient.name }} · {{ appointment.description }}
+                {{ formatTime(appointment.appointmentTime) }} - {{ formatTime(appointment.appointmentEndTime) }} {{ appointment.appointmentStatus == 'DENTIST_UNAVAILABLE' ? '' : '·' + appointment.patient.name + '·' + appointment.description }}
               </div>
             </div>
           </div>
@@ -54,7 +54,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { ElDatePicker, ElEmpty } from 'element-plus'
 import axios from 'axios'
-import type { Appointment } from '@/types/Appointment'
+import type { Appointment, Unavailbility } from '@/types/Appointment'
 import { offsetDate } from '@/helper'
 
 const authStore = useAuthStore()
@@ -96,9 +96,49 @@ const fetchAppointments = async () => {
     })
 }
 
-watch(selectedDate, fetchAppointments)
+const fetchUnavailablePeriods = async () => {
+  const userId = localStorage.getItem('userId')
+  if (!userId || !selectedDate.value) {
+    appointments.value = []
+    return
+  }
 
-onMounted(fetchAppointments)
+  axios
+    .get<Unavailbility[]>(`${import.meta.env.VITE_API_BASE_URL}/dentists/${userId}/unavailablePeriods`, {
+      params: {
+        date: offsetDate(selectedDate.value).toISOString().split('T')[0],
+      },
+    })
+    .then((response) => {
+      appointments.value.push(...response.data.map((unavailability) => ({
+        id: 100000 + unavailability.id,
+        appointmentTime: unavailability.startTime,
+        appointmentEndTime: unavailability.endTime,
+        appointmentType: {
+          name: unavailability.description,
+          durationMinutes: (new Date(unavailability.endTime).getTime() - new Date(unavailability.startTime).getTime()) / 60000,
+        },
+        patient: { name: '' },
+        description: '',
+        appointmentStatus: 'DENTIST_UNAVAILABLE'
+      })))
+      appointments.value.sort((a, b) => new Date(a.appointmentTime).getTime() - new Date(b.appointmentTime).getTime())
+    })
+    .catch((error) => {
+      console.error('Error fetching unavailbity period:', error)
+      appointments.value = []
+    })
+}
+
+watch(selectedDate, () => {
+  fetchAppointments()
+  fetchUnavailablePeriods()
+})
+
+onMounted(() => {
+  fetchAppointments()
+  fetchUnavailablePeriods()
+})
 
 const formatHour = (hour: number) => {
   return `${hour.toString().padStart(2, '0')}:00`
@@ -139,10 +179,14 @@ const getAppointmentStyle = (appointment: Appointment) => {
   
   const top = 5 + ((minutes - startOfDay) / totalMinutes) * 930
   const height = (duration / totalMinutes) * 900
-  
+  var color = '#4CAF50' // Default color for appointments
+  if (appointment.appointmentStatus === 'DENTIST_UNAVAILABLE') {
+    color = '#FF9800' // Color for unavailable periods
+  }
   return {
     top: `${top}px`, // Add header offset to top position
-    height: `${height}px`
+    height: `${height}px`,
+    borderLeft: `8px solid ${color}`
   }
 }
 </script>
@@ -220,7 +264,6 @@ const getAppointmentStyle = (appointment: Appointment) => {
   left: 0;
   right: 0;
   background: #f9f9f9;
-  border-left: 8px solid #4CAF50;
   padding: 1px 8px;
   margin-right: 8px;
   border-radius: 8px;

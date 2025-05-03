@@ -5,14 +5,21 @@ export interface Appointment {
   appointmentTime: Date;
   appointmentEndTime: Date;
   appointmentStatus: string;
+  description: string;
+}
+
+export interface Unavailbility {
+  id: number;
+  startTime: Date;
+  endTime: Date;
   description: string
 }
 
 interface Patient {
-    name: string
+  name: string
 }
 
 interface AppointmentType {
-    name: string
-    durationMinutes: number
+  name: string
+  durationMinutes: number
 }
