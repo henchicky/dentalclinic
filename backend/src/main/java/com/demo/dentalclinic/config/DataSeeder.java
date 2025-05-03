@@ -66,7 +66,7 @@ public class DataSeeder {
         }
         
         // Create some upcoming appointments
-        LocalDateTime startDateTime = LocalDateTime.now().plusDays(1).withHour(9).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime startDateTime = LocalDateTime.now().plusDays(1).withHour(8).withMinute(0).withSecond(0).withNano(0);
         
         // Track the current appointment time, starting from tomorrow at 9 AM
         LocalDateTime currentDateTime = startDateTime;
@@ -208,7 +208,7 @@ public class DataSeeder {
                 schedulePeriods.add(createSchedulePeriod(
                         dentist,
                         currentDate,
-                        LocalTime.of(9, 0),
+                        LocalTime.of(8, 0),
                         LocalTime.of(12, 0),
                         AvailabilityType.AVAILABLE,
                         "Morning shift"
@@ -229,7 +229,7 @@ public class DataSeeder {
                         dentist,
                         currentDate,
                         LocalTime.of(13, 0),
-                        LocalTime.of(19, 0),
+                        LocalTime.of(20, 0),
                         AvailabilityType.AVAILABLE,
                         "Afternoon shift"
                 ));
@@ -243,19 +243,6 @@ public class DataSeeder {
                             LocalTime.of(15, 0),
                             AvailabilityType.UNAVAILABLE,
                             "Staff meeting"
-                    ));
-                }
-
-                // Dr. Jennifer Smith has special hours on Wednesdays
-                if (dentist.getName().equals("Dr. Jennifer Smith") &&
-                        currentDate.getDayOfWeek().getValue() == 3) {
-                    schedulePeriods.add(createSchedulePeriod(
-                            dentist,
-                            currentDate,
-                            LocalTime.of(17, 0),
-                            LocalTime.of(19, 0),
-                            AvailabilityType.AVAILABLE,
-                            "Evening appointments"
                     ));
                 }
             }
