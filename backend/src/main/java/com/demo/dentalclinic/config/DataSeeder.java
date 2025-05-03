@@ -51,14 +51,11 @@ public class DataSeeder {
 
             seedDentistSchedulePeriods(dentistRepository, dentistSchedulePeriodRepository);
 
-            seedAppointments(appointmentTypeService, appointmentService);
+            seedAppointments(appointmentTypeService, appointmentService, patientRepository);
         };
     }
 
-    private void seedAppointments(AppointmentTypeService appointmentTypeService, AppointmentService appointmentService) {
-        // Inject required services
-        PatientRepository patientRepository = appointmentService.getPatientRepository();
-        
+    private void seedAppointments(AppointmentTypeService appointmentTypeService, AppointmentService appointmentService, PatientRepository patientRepository) {
         // Get all appointment types and patients
         List<AppointmentType> appointmentTypes = appointmentTypeService.getAllAppointmentTypes();
         List<Patient> patients = patientRepository.findAll();
@@ -93,16 +90,39 @@ public class DataSeeder {
             request.setAppointmentType(appointmentType.getId());
             request.setAppointmentTime(currentDateTime);
 
-            try {
-                // Create the appointment using the service
-                Appointment appointment = appointmentService.createAppointment(request);
-                
-                // Move to the next time slot based on appointment duration
-                currentDateTime = currentDateTime.plusMinutes(appointmentType.getDurationMinutes());
-            } catch (Exception e) {
-                // If there's an error (like no dentist available), move the time forward and try again
-                System.out.println("Failed to create appointment at " + currentDateTime + ": " + e.getMessage());
-                currentDateTime = currentDateTime.plusHours(1);
+            boolean appointmentCreated = false;
+            
+            // Keep trying until we successfully create the appointment
+            while (!appointmentCreated) {
+                try {
+                    // Create the appointment using the service
+                    Appointment appointment = appointmentService.createAppointment(request);
+                    
+                    // If we get here, the appointment was created successfully
+                    appointmentCreated = true;
+                    System.out.println("Created appointment at " + request.getAppointmentTime() + " for " + patient.getName() + " - " + appointmentType.getName());
+                    
+                    // Move to the next time slot based on appointment duration
+                    currentDateTime = request.getAppointmentTime().plusMinutes(appointmentType.getDurationMinutes());
+                } catch (Exception e) {
+                    // If there's an error (like no dentist available), move the time forward by 1 hour
+                    LocalDateTime failedTime = request.getAppointmentTime();
+                    LocalDateTime newTime = failedTime.plusHours(1);
+                    
+                    System.out.println("Failed to create appointment at " + failedTime + ": " + e.getMessage());
+                    System.out.println("Retrying at " + newTime);
+                    
+                    // If we're past working hours, move to the next day
+                    if (newTime.getHour() >= 19) {
+                        dayCounter++;
+                        newTime = startDateTime.plusDays(dayCounter).withHour(9).withMinute(0);
+                        System.out.println("Moving to next day: " + newTime);
+                    }
+                    
+                    // Update the time in the request and our tracking variable
+                    request.setAppointmentTime(newTime);
+                    currentDateTime = newTime;
+                }
             }
         }
     }
@@ -121,7 +141,11 @@ public class DataSeeder {
     private void seedPatients(PatientRepository patientRepository) {
         List<Patient> patients = Arrays.asList(
                 createPatient("John Doe"),
-                createPatient("Jane Smith")
+                createPatient("Mary Smith"),
+                createPatient("Toddy Roe"),
+                createPatient("Samatha Reed"),
+                createPatient("Diana Tee"),
+                createPatient("Harry Brown")
         );
         patientRepository.saveAll(patients);
     }
