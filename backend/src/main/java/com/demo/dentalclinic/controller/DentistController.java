@@ -2,6 +2,7 @@ package com.demo.dentalclinic.controller;
 
 import com.demo.dentalclinic.dto.DentistScheduleRequest;
 import com.demo.dentalclinic.dto.LoginRequest;
+import com.demo.dentalclinic.dto.UnavailableDTO;
 import com.demo.dentalclinic.model.Appointment;
 import com.demo.dentalclinic.model.DentistSchedulePeriod;
 import com.demo.dentalclinic.service.DentistScheduleService;
@@ -43,5 +44,12 @@ public class DentistController {
             @PathVariable Long dentistId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return dentistScheduleService.getDentistAppointmentsByDate(dentistId, date);
+    }
+
+    @GetMapping("/{dentistId}/unavailablePeriods")
+    public List<UnavailableDTO> getDentistUnavailablePeriodsByDate(
+            @PathVariable Long dentistId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return dentistScheduleService.getUnavailablePeriods(dentistId, date);
     }
 } 

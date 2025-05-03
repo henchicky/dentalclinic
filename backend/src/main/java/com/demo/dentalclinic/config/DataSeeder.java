@@ -86,7 +86,7 @@ public class DataSeeder {
             // Create appointment request
             AppointmentRequest request = new AppointmentRequest();
             request.setName(patient.getName());
-            request.setDescription("Seeded appointment #" + (i + 1));
+            request.setDescription("Description appointment #" + (i + 1));
             request.setAppointmentType(appointmentType.getId());
             request.setAppointmentTime(currentDateTime);
 

@@ -1,6 +1,7 @@
 package com.demo.dentalclinic.service;
 
 import com.demo.dentalclinic.dto.DentistScheduleRequest;
+import com.demo.dentalclinic.dto.UnavailableDTO;
 import com.demo.dentalclinic.model.Appointment;
 import com.demo.dentalclinic.model.DentistSchedulePeriod;
 import com.demo.dentalclinic.repository.AppointmentRepository;
@@ -11,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DentistScheduleService {
@@ -49,6 +52,20 @@ public class DentistScheduleService {
 
     public List<DentistSchedulePeriod> getAvailablePeriods(Long dentistId, LocalDate date) {
         return dentistSchedulePeriodRepository.findByDentistIdAndDateAndType(
-            dentistId, date, AvailabilityType.AVAILABLE);
+                dentistId, date, AvailabilityType.AVAILABLE);
+    }
+
+    public List<UnavailableDTO> getUnavailablePeriods(Long dentistId, LocalDate date) {
+        var unavailable = dentistSchedulePeriodRepository.findByDentistIdAndDateAndType(
+                dentistId, date, AvailabilityType.UNAVAILABLE);
+
+        return unavailable.stream()
+                .map(period -> new UnavailableDTO(
+                        period.getId(),
+                        LocalDateTime.of(period.getDate(), period.getStartTime()),
+                        LocalDateTime.of(period.getDate(), period.getEndTime()),
+                        period.getDescription()
+                ))
+                .collect(Collectors.toList());
     }
 } 
