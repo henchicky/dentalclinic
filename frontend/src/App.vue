@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RouterLink, RouterView, useRouter } from 'vue-router'
+import { RouterLink, RouterView } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 import { computed } from 'vue'
 import router from './router'
@@ -11,6 +11,10 @@ const username = computed(() => authStore.user)
 function logout() {
   authStore.logout()
   router.push('/')
+}
+
+function schedule() {
+  router.push('/schedule')
 }
 </script>
 
@@ -32,6 +36,7 @@ function logout() {
             </span>
             <template #dropdown>
               <el-dropdown-menu>
+                <el-dropdown-item @click="schedule">Schedule</el-dropdown-item>
                 <el-dropdown-item @click="logout">Logout</el-dropdown-item>
               </el-dropdown-menu>
             </template>

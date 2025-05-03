@@ -39,7 +39,7 @@
                 {{ appointment.appointmentType.name }} · {{ appointment.appointmentType.durationMinutes }}min
               </div>
               <div class="appointment-details">
-                {{ formatTime(appointment.appointmentTime) }} · {{ appointment.patient.name }}
+                {{ formatTime(appointment.appointmentTime) }} - {{ formatTime(appointment.appointmentEndTime) }} · {{ appointment.patient.name }} · {{ appointment.description }}
               </div>
             </div>
           </div>
@@ -137,7 +137,7 @@ const getAppointmentStyle = (appointment: Appointment) => {
   const startOfDay = 8 * 60 // 8 AM in minutes
   const totalMinutes = 12 * 60 // 12 hours in minutes
   
-  const top = 10 + ((minutes - startOfDay) / totalMinutes) * 930
+  const top = 5 + ((minutes - startOfDay) / totalMinutes) * 930
   const height = (duration / totalMinutes) * 900
   
   return {
@@ -219,11 +219,11 @@ const getAppointmentStyle = (appointment: Appointment) => {
   position: absolute;
   left: 0;
   right: 0;
-  background: #ffffff;
-  border-left: 4px solid #4CAF50;
+  background: #f9f9f9;
+  border-left: 8px solid #4CAF50;
   padding: 1px 8px;
   margin-right: 8px;
-  border-radius: 4px;
+  border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   z-index: 1;
   transition: transform 0.2s, box-shadow 0.2s;
@@ -237,7 +237,7 @@ const getAppointmentStyle = (appointment: Appointment) => {
 }
 
 .appointment-content {
-  background: #ffffff;
+  background: #f9f9f9;
   height: 100%;
   display: flex;
   flex-direction: column;
