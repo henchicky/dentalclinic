@@ -9,7 +9,6 @@
         v-model="selectedDate"
         type="date"
         placeholder="Select a date"
-        class="date-picker"
         :clearable="false"
       />
     </div>
@@ -92,7 +91,6 @@ const fetchAppointments = async () => {
     })
 }
 
-// Watch for changes in selectedDate and fetch appointments
 watch(selectedDate, fetchAppointments)
 
 onMounted(fetchAppointments)
@@ -122,19 +120,6 @@ const getStatusColor = (status: string) => {
       return '#e6a23c'
   }
 }
-
-const getTypeTagType = (type: string) => {
-  switch (type.toLowerCase()) {
-    case 'consultation':
-      return 'info'
-    case 'surgery':
-      return 'danger'
-    case 'cleaning':
-      return 'success'
-    default:
-      return 'primary'
-  }
-}
 </script>
 
 <style scoped>
@@ -160,10 +145,6 @@ const getTypeTagType = (type: string) => {
   color: #888;
   font-size: 0.95rem;
   margin-top: 0.15rem;
-}
-
-.date-picker {
-  width: 200px;
 }
 
 .list-view {
