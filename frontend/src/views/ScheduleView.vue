@@ -54,7 +54,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { ElDatePicker, ElEmpty } from 'element-plus'
 import axios from 'axios'
-import type { Appointment, Unavailbility } from '@/types/Appointment'
+import type { Appointment, Unavailbility } from '@/types/Models'
 import { offsetDate } from '@/helper'
 
 const authStore = useAuthStore()
