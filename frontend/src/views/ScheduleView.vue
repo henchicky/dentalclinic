@@ -65,9 +65,6 @@ const appointments = ref([] as Appointment[])
 const unavailability = ref([] as Appointment[])
 const schedules = computed(() => {
   let array = appointments.value.concat(unavailability.value)
-  console.log("appointments" , appointments.value)
-  console.log("unavailability", unavailability.value)
-  console.log(array)
   return array.sort((a, b) => new Date(a.appointmentTime).getTime() - new Date(b.appointmentTime).getTime())
 })
 
