@@ -67,8 +67,6 @@ public class AppointmentService {
     }
 
     private boolean isDentistAvailableForAppointment(Long dentistId, LocalDate date, LocalTime startTime, LocalTime endTime) {
-
-        // Get all available periods for the dentist on the given date
         List<DentistSchedulePeriod> availablePeriods = dentistScheduleService.getAvailablePeriods(dentistId, date);
 
         // Check if the appointment time falls within any available period
@@ -80,10 +78,14 @@ public class AppointmentService {
                 return false;
             }
 
-            // Check for existing appointments that might overlap
-            List<Appointment> existingAppointments = appointmentRepository.findByDentistIdAndAppointmentTimeGreaterThanEqualAndAppointmentEndTimeLessThanEqual(dentistId, date.atTime(startTime), date.atTime(endTime));
-
-            return existingAppointments.isEmpty();
+            // Check for existing appointments that might overlap using the new method
+            LocalDateTime appointmentStartDateTime = date.atTime(startTime);
+            LocalDateTime appointmentEndDateTime = date.atTime(endTime);
+            
+            List<Appointment> overlappingAppointments = appointmentRepository.findOverlappingAppointments(
+                    dentistId, appointmentStartDateTime, appointmentEndDateTime);
+    
+            return overlappingAppointments.isEmpty();
         });
     }
 

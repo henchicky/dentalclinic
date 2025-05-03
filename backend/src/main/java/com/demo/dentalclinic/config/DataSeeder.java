@@ -51,11 +51,11 @@ public class DataSeeder {
 
             seedDentistSchedulePeriods(dentistRepository, dentistSchedulePeriodRepository);
 
-            seedAppointments(appointmentTypeService, appointmentService, patientRepository);
+            seedAppointments(appointmentTypeService, appointmentService, patientRepository, dentistRepository);
         };
     }
 
-    private void seedAppointments(AppointmentTypeService appointmentTypeService, AppointmentService appointmentService, PatientRepository patientRepository) {
+    private void seedAppointments(AppointmentTypeService appointmentTypeService, AppointmentService appointmentService, PatientRepository patientRepository, DentistRepository dentistRepository) {
         // Get all appointment types and patients
         List<AppointmentType> appointmentTypes = appointmentTypeService.getAllAppointmentTypes();
         List<Patient> patients = patientRepository.findAll();
@@ -66,13 +66,14 @@ public class DataSeeder {
         }
         
         // Create some upcoming appointments
-        LocalDateTime startDateTime = LocalDateTime.now().plusDays(1).withHour(8).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime startDateTime = LocalDateTime.now().withHour(8).withMinute(0).withSecond(0).withNano(0);
         
         // Track the current appointment time, starting from tomorrow at 9 AM
         LocalDateTime currentDateTime = startDateTime;
         int dayCounter = 0;
-        
-        // Create 15 sample appointments
+
+        int dentistCount = dentistRepository.findAll().size();
+        // Create 15 sample appointments for each dentist
         for (int i = 0; i < 15; i++) {
             Patient patient = patients.get(i % patients.size());
             AppointmentType appointmentType = appointmentTypes.get(i % appointmentTypes.size());
@@ -129,8 +130,8 @@ public class DataSeeder {
 
     private void seedDentists(DentistRepository dentistRepository) {
         List<Dentist> dentists = Arrays.asList(
-                createDentist("Jennifer", "Jennifer")
-//                createDentist("Michael", "Michael"),
+                createDentist("Jennifer", "Jennifer"),
+                createDentist("Michael", "Michael")
 //                createDentist("Sarah", "Sarah"),
 //                createDentist("David", "David"),
 //                createDentist("Emily", "Emily")
@@ -191,7 +192,7 @@ public class DataSeeder {
         List<DentistSchedulePeriod> schedulePeriods = new ArrayList<>();
 
         // Create schedule periods for 14 days (2 weeks) starting from tomorrow
-        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate startDate = LocalDate.now();
 
         for (Dentist dentist : dentists) {
             for (int day = 0; day < 14; day++) {
