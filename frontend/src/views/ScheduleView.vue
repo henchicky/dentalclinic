@@ -256,15 +256,13 @@ const getAppointmentStyle = (appointment: Appointment) => {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #4caf5096;
+  background-color: #4caf4fc7;
   z-index: 5;
 }
 
 .appointment-cards {
   position: relative;
   height: 100%;
-  margin: 0px auto;
-  width: 90%;
 }
 
 .appointment-card {
