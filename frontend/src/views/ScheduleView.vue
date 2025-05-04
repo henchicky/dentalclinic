@@ -163,15 +163,15 @@ const currentTimeStyle = computed(() => {
   const minutes = now.getHours() * 60 + now.getMinutes()
   const startOfDay = 8 * 60 // 8 AM in minutes
   const totalMinutes = 12 * 60 // 12 hours in minutes
-  const percentage = ((minutes - startOfDay) / totalMinutes) * 100
-  
+  const top = ((minutes - startOfDay) / totalMinutes) * 930
+
   // Only show the current time line between 8 AM and 8 PM
   if (minutes < startOfDay || minutes > startOfDay + totalMinutes) {
     return { display: 'none' }
   }
   
   return {
-    top: `${percentage}%`
+    top: `${top}px`
   }
 })
 
@@ -256,13 +256,15 @@ const getAppointmentStyle = (appointment: Appointment) => {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #4CAF50;
-  z-index: 1;
+  background-color: #4caf5096;
+  z-index: 5;
 }
 
 .appointment-cards {
   position: relative;
   height: 100%;
+  margin: 0px auto;
+  width: 90%;
 }
 
 .appointment-card {
