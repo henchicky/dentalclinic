@@ -10,7 +10,7 @@ const username = computed(() => authStore.user)
 
 function logout() {
   authStore.logout()
-  router.push('/')
+  router.push('/login')
 }
 
 function schedule() {
