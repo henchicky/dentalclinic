@@ -21,17 +21,11 @@ public class DentistScheduleService {
 
     private final DentistSchedulePeriodRepository dentistSchedulePeriodRepository;
     private final DentistRepository dentistRepository;
-    private final AppointmentRepository appointmentRepository;
 
     @Autowired
-    public DentistScheduleService(DentistSchedulePeriodRepository dentistSchedulePeriodRepository, DentistRepository dentistRepository, AppointmentRepository appointmentRepository) {
+    public DentistScheduleService(DentistSchedulePeriodRepository dentistSchedulePeriodRepository, DentistRepository dentistRepository) {
         this.dentistSchedulePeriodRepository = dentistSchedulePeriodRepository;
         this.dentistRepository = dentistRepository;
-        this.appointmentRepository = appointmentRepository;
-    }
-
-    public List<Appointment> getDentistAppointmentsByDate(Long dentistId, LocalDate date) {
-        return appointmentRepository.findByDentistIdAndAppointmentTimeGreaterThanEqualAndAppointmentEndTimeLessThanEqual(dentistId, date.atStartOfDay(), date.plusDays(1).atStartOfDay());
     }
 
     public DentistSchedulePeriod createSchedulePeriod(DentistScheduleRequest request) {

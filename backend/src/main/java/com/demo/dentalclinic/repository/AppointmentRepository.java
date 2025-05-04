@@ -13,8 +13,6 @@ import java.util.List;
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
     List<Appointment> findByDentistIdAndAppointmentTimeGreaterThanEqualAndAppointmentEndTimeLessThanEqual(Long dentistId, LocalDateTime startTime, LocalDateTime endTime);
 
-    List<Appointment> findByDentistId(Long dentistId);
-
     @Query("SELECT a FROM Appointment a WHERE a.dentist.id = :dentistId AND " +
             // Case 1: Appointment starts before or at the requested start time and ends after or at the requested start time
             "(a.appointmentTime <= :startTime AND a.appointmentEndTime > :startTime) OR " +
@@ -22,7 +20,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             "(a.appointmentTime >= :startTime AND a.appointmentTime < :endTime) OR " +
             // Case 3: Appointment completely encompasses the requested time range
             "(a.appointmentTime <= :startTime AND a.appointmentEndTime >= :endTime)")
-    List<Appointment> findOverlappingAppointments(
+    List<Appointment> findExistingAppointments(
             @Param("dentistId") Long dentistId,
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime);

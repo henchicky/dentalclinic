@@ -5,6 +5,7 @@ import com.demo.dentalclinic.dto.LoginRequest;
 import com.demo.dentalclinic.dto.UnavailableDTO;
 import com.demo.dentalclinic.model.Appointment;
 import com.demo.dentalclinic.model.DentistSchedulePeriod;
+import com.demo.dentalclinic.service.AppointmentService;
 import com.demo.dentalclinic.service.DentistScheduleService;
 import com.demo.dentalclinic.service.DentistService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,13 @@ import java.util.List;
 public class DentistController {
 
     private final DentistScheduleService dentistScheduleService;
+    private final AppointmentService appointmentService;
     private final DentistService dentistService;
 
     @Autowired
-    public DentistController(DentistScheduleService dentistScheduleService, DentistService dentistService) {
+    public DentistController(DentistScheduleService dentistScheduleService, AppointmentService appointmentService, DentistService dentistService) {
         this.dentistScheduleService = dentistScheduleService;
+        this.appointmentService = appointmentService;
         this.dentistService = dentistService;
     }
 
@@ -43,7 +46,7 @@ public class DentistController {
     public List<Appointment> getDentistAppointmentsByDate(
             @PathVariable Long dentistId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return dentistScheduleService.getDentistAppointmentsByDate(dentistId, date);
+        return appointmentService.getDentistAppointmentsByDate(dentistId, date);
     }
 
     @GetMapping("/{dentistId}/unavailablePeriods")

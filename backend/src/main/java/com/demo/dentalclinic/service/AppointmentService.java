@@ -36,7 +36,7 @@ public class AppointmentService {
 
     public Appointment createAppointment(AppointmentRequest request) {
         AppointmentType appointmentType = appointmentTypeService.getAppointmentTypeById(request.getAppointmentType())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid appointment type"));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid appointment type: " + request.getAppointmentType()));
 
         LocalDateTime appointmentStart = request.getAppointmentTime();
         LocalDateTime appointmentEnd = appointmentStart.plusMinutes(appointmentType.getDurationMinutes());
@@ -69,21 +69,16 @@ public class AppointmentService {
     private boolean isDentistAvailableForAppointment(Long dentistId, LocalDate date, LocalTime startTime, LocalTime endTime) {
         List<DentistSchedulePeriod> availablePeriods = dentistScheduleService.getAvailablePeriods(dentistId, date);
 
-        // Check if the appointment time falls within any available period
         return availablePeriods.stream().anyMatch(period -> {
-            // Check if the appointment time is within the available period
+
             boolean isWithinPeriod = !startTime.isBefore(period.getStartTime()) && !endTime.isAfter(period.getEndTime());
 
             if (!isWithinPeriod) {
                 return false;
             }
-
-            // Check for existing appointments that might overlap using the new method
-            LocalDateTime appointmentStartDateTime = date.atTime(startTime);
-            LocalDateTime appointmentEndDateTime = date.atTime(endTime);
             
-            List<Appointment> overlappingAppointments = appointmentRepository.findOverlappingAppointments(
-                    dentistId, appointmentStartDateTime, appointmentEndDateTime);
+            List<Appointment> overlappingAppointments = appointmentRepository.findExistingAppointments(
+                    dentistId, date.atTime(startTime), date.atTime(endTime));
     
             return overlappingAppointments.isEmpty();
         });
@@ -91,9 +86,9 @@ public class AppointmentService {
     
     public List<AvailableTimeSlotDTO> findAllAvailableTimeSlots() {
         // Map to store available timings by date
-        java.util.Map<LocalDate, List<LocalTime>> availableTimesByDate = new java.util.HashMap<>();
+        java.util.Map<LocalDate, List<LocalTime>> availableTimesByDate = new java.util.TreeMap<>();
         
-        // Get current date and next 30 days
+        // Get the current date and next 30 days
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = startDate.plusDays(30);
         
@@ -105,7 +100,7 @@ public class AppointmentService {
                 // Get all available periods for the dentist on the current date
                 List<DentistSchedulePeriod> availablePeriods = dentistScheduleService.getAvailablePeriods(
                         dentist.getId(), date);
-                
+
                 if (availablePeriods.isEmpty()) {
                     continue;
                 }
@@ -129,7 +124,6 @@ public class AppointmentService {
             }
         }
         
-        // Convert the map to a list of DTOs
         List<AvailableTimeSlotDTO> result = new ArrayList<>();
         for (java.util.Map.Entry<LocalDate, List<LocalTime>> entry : availableTimesByDate.entrySet()) {
             // Sort the times for consistency
@@ -190,5 +184,9 @@ public class AppointmentService {
             // Move to next 30-minute slot
             currentTime = slotEnd;
         }
+    }
+
+    public List<Appointment> getDentistAppointmentsByDate(Long dentistId, LocalDate date) {
+        return appointmentRepository.findExistingAppointments(dentistId, date.atStartOfDay(), date.plusDays(1).atStartOfDay());
     }
 } 
