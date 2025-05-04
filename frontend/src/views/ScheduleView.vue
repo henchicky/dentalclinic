@@ -55,12 +55,11 @@ import { useAuthStore } from '../stores/auth'
 import { ElDatePicker, ElEmpty } from 'element-plus'
 import axios from 'axios'
 import type { Appointment, Unavailbility } from '@/types/model'
-import { offsetDate } from '@/helper'
+import { getTommorrow, offsetDate } from '@/helper'
 
 const authStore = useAuthStore()
 
-const tommorrow = new Date()
-tommorrow.setDate(tommorrow.getDate() + 1)
+const tommorrow = getTommorrow()
 const selectedDate = ref(new Date())
 const username = computed(() => authStore.user)
 const appointments = ref([] as Appointment[])

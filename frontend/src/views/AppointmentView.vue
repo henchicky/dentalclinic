@@ -57,7 +57,7 @@ import { User } from '@element-plus/icons-vue'
 import { ElNotification } from 'element-plus'
 import axios from 'axios'
 import { format } from 'date-fns'
-import { offsetDate } from '@/helper'
+import { getTommorrow, offsetDate } from '@/helper'
 
 interface AppointmentType {
   id: number;
@@ -75,6 +75,7 @@ interface AppointmentForm {
 const appointmentTypes = reactive<AppointmentType[]>([]);
 const appointmentFormRef = ref();
 const availableDates = ref<Record<string, string[]>>({});
+const tommorrow = getTommorrow()
 
 const appointmentForm = reactive<AppointmentForm>({
   patientName: '',
@@ -115,11 +116,9 @@ const availableTimes = computed(() => {
 
 function disabledDate(time: Date) {
   offsetDate(time)
-  const dateString = time.toISOString().split('T')[0]
-  var currentDate = new Date()
-  currentDate.setDate(currentDate.getDate() + 1);
+  const dateString = time.toISOString().split('T')[0];
 
-  return !availableDates.value[dateString] || time < currentDate
+  return !availableDates.value[dateString] || time < tommorrow
 }
 
 const submitAppointment = async () => {
