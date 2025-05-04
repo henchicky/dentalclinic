@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class AppointmentService {
@@ -86,7 +85,7 @@ public class AppointmentService {
     
     public List<AvailableTimeSlotDTO> findAllAvailableTimeSlots() {
         // Map to store available timings by date
-        java.util.Map<LocalDate, List<LocalTime>> availableTimesByDate = new java.util.TreeMap<>();
+        Map<LocalDate, List<LocalTime>> availableTimesByDate = new TreeMap<>();
         
         // Get the current date and next 30 days
         LocalDate startDate = LocalDate.now();
@@ -125,9 +124,9 @@ public class AppointmentService {
         }
         
         List<AvailableTimeSlotDTO> result = new ArrayList<>();
-        for (java.util.Map.Entry<LocalDate, List<LocalTime>> entry : availableTimesByDate.entrySet()) {
+        for (Map.Entry<LocalDate, List<LocalTime>> entry : availableTimesByDate.entrySet()) {
             // Sort the times for consistency
-            java.util.Collections.sort(entry.getValue());
+            Collections.sort(entry.getValue());
             
             // Create a DTO with the date and its available times
             if(!entry.getValue().isEmpty()){
@@ -139,7 +138,7 @@ public class AppointmentService {
         }
         
         // Sort the result by date
-        result.sort(java.util.Comparator.comparing(AvailableTimeSlotDTO::getDate));
+        result.sort(Comparator.comparing(AvailableTimeSlotDTO::getDate));
         
         return result;
     }
@@ -148,7 +147,7 @@ public class AppointmentService {
             LocalDate date,
             DentistSchedulePeriod period,
             List<Appointment> existingAppointments,
-            java.util.Map<LocalDate, List<LocalTime>> availableTimesByDate) {
+            Map<LocalDate, List<LocalTime>> availableTimesByDate) {
 
         LocalTime currentTime = period.getStartTime();
         LocalTime endTime = period.getEndTime();
