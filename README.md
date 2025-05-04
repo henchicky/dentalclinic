@@ -2,173 +2,132 @@
 
 A full-stack application for managing dental clinic appointments, built with Spring Boot and Vue.js.
 
-## Prerequisites
+## Overview
+
+This application allows:
+- Patients to book dental appointments online
+- Dentists to manage their schedules
+- Automatic allocation of patients to available dentists
+- Real-time availability tracking
+
+## Application Interface
+
+### Landing Page
+![Landing Page](sample-images/landing-page.png)
+*The landing page provides an overview of the dental clinic services and allows patients to book appointments. Link for dentist to access their schedules.*
+
+### Appointment Booking
+![Book Appointment](sample-images/book-appointment.png)
+*Appointment booking interface where patients can select services and available time slots.*
+
+### Login Page
+![Login Page](sample-images/login.png)
+*Login interface for dentists to access their schedules.*
+
+### Dentist Schedule Management
+![Dentist Schedule](sample-images/dentist-schedule.png)
+*Dentists can view their daily schedules*
+
+## Getting Started
 
 ### Required Software
 
-1. **Java Development Kit (JDK) 17**
-
-   - Download from: [Oracle JDK 17](https://www.oracle.com/java/technologies/downloads/#java17) or [OpenJDK 17](https://adoptium.net/temurin/releases/?version=17)
-   - Verify installation: `java -version`
+1. **Java Development Kit (JDK) 24**
+   - Download from: [Oracle JDK 24](https://www.oracle.com/sg/java/technologies/downloads/)
+   - Verify: `java -version`
 
 2. **Maven 3.8+**
-
    - Download from: [Maven Download](https://maven.apache.org/download.cgi)
-   - Verify installation: `mvn -version`
+   - Verify: `mvn -version`
 
-3. **Node.js 18+**
-
+3. **Node.js 22+ (LTS)**
    - Download from: [Node.js Download](https://nodejs.org/en/download/)
-   - Verify installation: `node --version`
+   - Verify: `node --version`
 
-4. **npm 9+**
-   - Comes with Node.js
-   - Verify installation: `npm --version`
-
-## Project Structure
-
+### Project Structure
 ```
 dentalclinic/
 ├── backend/          # Spring Boot application
 └── frontend/         # Vue.js application
 ```
 
-## Backend Setup and Running
+## Setup Instructions
 
-1. Navigate to the backend directory:
-
+### Backend Setup
+1. Navigate to backend:
    ```bash
    cd backend
    ```
 
-2. Build the project:
-
+2. Build project:
    ```bash
    mvn clean install
    ```
 
-3. Run the Spring Boot application:
+3. Run application:
    ```bash
    mvn spring-boot:run
    ```
+   Note: You can also run the backend using IntelliJ.
 
-The backend server will start at: `http://localhost:8080`
-
-### Backend Features
-
-- RESTful API endpoints
-- H2 in-memory database
-- Swagger UI documentation at: `http://localhost:8080/swagger-ui.html`
-- H2 Console at: `http://localhost:8080/h2-console`
-
-## Frontend Setup and Running
-
-1. Navigate to the frontend directory:
-
+### Frontend Setup
+1. Navigate to frontend:
    ```bash
    cd frontend
    ```
 
 2. Install dependencies:
-
    ```bash
    npm install
    ```
 
-3. Start the development server:
+3. Start development server:
    ```bash
    npm run dev
    ```
 
-The frontend application will start at: `http://localhost:5173`
+### Access Points
+| Component     | URL                              |
+|--------------|----------------------------------|
+| Frontend     | http://localhost:5173            |
+| Backend API  | http://localhost:8080/api        |
+| Swagger UI   | http://localhost:8080/swagger-ui.html |
+| DB Console   | http://localhost:8080/h2-console |
 
-### Frontend Features
+## System Features
 
-- Vue 3 with TypeScript
-- Vite for fast development
-- Pinia for state management
-- Vue Router for navigation
-- Axios for API calls
+### For Patients
+- Book appointments by selecting:
+  - Appointment type
+  - Preferred date and time
+  - Description
+- Automatic assignment to available dentist
+- Real-time availability checking
+- Disabled slots for unavailable times/dates
 
-## Development Workflow
+### For Dentists
+- Login system
+- View daily schedules
+- View unavailable periods
 
-1. Start the backend server:
+### Demo Login Credentials
 
-   ```bash
-   cd backend
-   mvn spring-boot:run
-   ```
+| Username | Password |
+|----------|----------|
+| Jennifer | Jennifer |
+| Michael  | Michael  |
 
-2. In a new terminal, start the frontend development server:
+### Available Services
 
-   ```bash
-   cd frontend
-   npm run dev
-   ```
-
-3. Access the application:
-   - Frontend: `http://localhost:5173`
-   - Backend API: `http://localhost:8080/api`
-   - Swagger UI: `http://localhost:8080/swagger-ui.html`
-   - H2 Console: `http://localhost:8080/h2-console`
-
-## Troubleshooting
-
-### Backend Issues
-
-1. If Maven build fails:
-
-   - Clean Maven cache: `mvn clean`
-   - Update dependencies: `mvn dependency:purge-local-repository`
-
-2. If H2 database connection fails:
-   - Check if the server is running
-   - Verify the JDBC URL in application.properties
-
-### Frontend Issues
-
-1. If npm install fails:
-
-   - Clear npm cache: `npm cache clean --force`
-   - Delete node_modules: `rm -rf node_modules`
-   - Reinstall: `npm install`
-
-2. If Vite server fails to start:
-   - Check if port 5173 is available
-   - Verify Node.js version is 18+
-
-## Appointment Types
-
-| Type         | Number of slots | Duration (mins) |
-| ------------ | --------------- | --------------- |
-| Cleaning     | 2               | 30              |
-| Extraction   | 3               | 45              |
-| Consultation | 2               | 30              |
-| Filling      | 2               | 30              |
-| Root Canal   | 6               | 90              |
-| Crown        | 4               | 60              |
-| Bridge       | 6               | 90              |
-| Denture      | 3               | 60              |
-| Braces       | 3               | 60              |
-| Others       | 2               | 30              |
-
-- 1 time slot is 15 minutes.
-- Depending on the type of service required by patient, system will allocate the proper number of slots to patients and book dentist time.
-
-## Patient
-
-Patients can book an appointment by going to the website.
-They will select the type of appointment they want and choose from the available timeslots. 
-
-I want multiple endpoints to support the system.
-1. Get Endpoint - return the different types of appointments
-2. Get Endpoint - return the available timeslots for patients to choose
-3. Get Endpoint - return the dentist's schedule group by day. Dentist should be able to see their appointments and free time.
-4. Post endpoint - for dentist to create their schedule by day
-Dentist can input their start and end time, and also input unavailable periods. Unavailable periods can be for lunch breaks or o
-
-Come up with a suitable name for the endpoint.
-Come up with a suitable database schema to support such these usecases.
-Suggest and come up with better ideas.
-
-Do not do any code changes yet. 
+| Service Type  | Duration (mins) |
+|--------------|----------------|
+| Cleaning     | 30            |
+| Consultation | 30            |
+| Filling      | 30            |
+| Extraction   | 45            |
+| Crown        | 60            |
+| Denture      | 60            |
+| Braces       | 60            |
+| Root Canal   | 90            |
+| Bridge       | 90            |
+| Others       | 30            |
