@@ -56,7 +56,6 @@ public class DataSeeder {
     }
 
     private void seedAppointments(AppointmentTypeService appointmentTypeService, AppointmentService appointmentService, PatientRepository patientRepository, DentistRepository dentistRepository) {
-        // Get all appointment types and patients
         List<AppointmentType> appointmentTypes = appointmentTypeService.getAllAppointmentTypes();
         List<Patient> patients = patientRepository.findAll();
         
@@ -65,10 +64,8 @@ public class DataSeeder {
             return;
         }
         
-        // Create some upcoming appointments
         LocalDateTime startDateTime = LocalDateTime.now().withHour(8).withMinute(0).withSecond(0).withNano(0);
-        
-        // Track the current appointment time, starting from tomorrow at 9 AM
+
         LocalDateTime currentDateTime = startDateTime;
         int dayCounter = 0;
 
@@ -77,14 +74,12 @@ public class DataSeeder {
         for (int i = 0; i < 15; i++) {
             Patient patient = patients.get(i % patients.size());
             AppointmentType appointmentType = appointmentTypes.get(i % appointmentTypes.size());
-            
-            // If we've added appointments pushing past 5 PM, move to the next day
+
             if (currentDateTime.getHour() >= 19) {
                 dayCounter++;
                 currentDateTime = startDateTime.plusDays(dayCounter).withHour(9).withMinute(0);
             }
-            
-            // Create appointment request
+
             AppointmentRequest request = new AppointmentRequest();
             request.setName(patient.getName());
             request.setDescription("Description appointment #" + (i + 1));
@@ -92,35 +87,30 @@ public class DataSeeder {
             request.setAppointmentTime(currentDateTime);
 
             boolean appointmentCreated = false;
-            
-            // Keep trying until we successfully create the appointment
+
             while (!appointmentCreated) {
                 try {
-                    // Create the appointment using the service
                     Appointment appointment = appointmentService.createAppointment(request);
-                    
-                    // If we get here, the appointment was created successfully
+
                     appointmentCreated = true;
                     System.out.println("Created appointment at " + request.getAppointmentTime() + " for " + patient.getName() + " - " + appointmentType.getName());
                     
                     // Move to the next time slot based on appointment duration
                     currentDateTime = request.getAppointmentTime().plusMinutes(appointmentType.getDurationMinutes());
                 } catch (Exception e) {
-                    // If there's an error (like no dentist available), move the time forward by 1 hour
+                    // If there's an error (like no dentist available), move the time forward by 15 mins
                     LocalDateTime failedTime = request.getAppointmentTime();
                     LocalDateTime newTime = failedTime.plusMinutes(15);
                     
                     System.out.println("Failed to create appointment at " + failedTime + ": " + e.getMessage());
                     System.out.println("Retrying at " + newTime);
-                    
-                    // If we're past working hours, move to the next day
+
                     if (newTime.getHour() >= 19) {
                         dayCounter++;
                         newTime = startDateTime.plusDays(dayCounter).withHour(9).withMinute(0);
                         System.out.println("Moving to next day: " + newTime);
                     }
                     
-                    // Update the time in the request and our tracking variable
                     request.setAppointmentTime(newTime);
                     currentDateTime = newTime;
                 }

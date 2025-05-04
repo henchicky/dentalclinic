@@ -34,7 +34,7 @@ export const useAuthStore = defineStore('auth', () => {
   function logout() {
     isAuthenticated.value = false
     user.value = null
-    // Remove from localStorage
+    
     localStorage.removeItem('isAuthenticated')
     localStorage.removeItem('user')
     localStorage.removeItem('userId')
