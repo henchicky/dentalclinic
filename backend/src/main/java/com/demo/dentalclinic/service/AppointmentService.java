@@ -92,8 +92,7 @@ public class AppointmentService {
         LocalDate endDate = startDate.plusDays(30);
         
         List<Dentist> dentists = dentistRepository.findAll();
-        
-        // For each date in the range
+
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
             for (Dentist dentist : dentists) {
                 // Get all available periods for the dentist on the current date
@@ -104,12 +103,10 @@ public class AppointmentService {
                     continue;
                 }
                 
-                // Get existing appointments for this dentist on this date
                 LocalDateTime dayStart = date.atStartOfDay();
                 LocalDateTime dayEnd = date.plusDays(1).atStartOfDay();
                 List<Appointment> existingAppointments = appointmentRepository
-                        .findByDentistIdAndAppointmentTimeGreaterThanEqualAndAppointmentEndTimeLessThanEqual(
-                                dentist.getId(), dayStart, dayEnd);
+                        .findExistingAppointments(dentist.getId(), dayStart, dayEnd);
                 
                 // For each available period, collect available times
                 for (DentistSchedulePeriod period : availablePeriods) {
@@ -125,10 +122,6 @@ public class AppointmentService {
         
         List<AvailableTimeSlotDTO> result = new ArrayList<>();
         for (Map.Entry<LocalDate, List<LocalTime>> entry : availableTimesByDate.entrySet()) {
-            // Sort the times for consistency
-            Collections.sort(entry.getValue());
-            
-            // Create a DTO with the date and its available times
             if(!entry.getValue().isEmpty()){
                 result.add(new AvailableTimeSlotDTO(
                         entry.getKey(),
@@ -136,8 +129,7 @@ public class AppointmentService {
                 ));
             }
         }
-        
-        // Sort the result by date
+
         result.sort(Comparator.comparing(AvailableTimeSlotDTO::getDate));
         
         return result;
@@ -151,8 +143,7 @@ public class AppointmentService {
 
         LocalTime currentTime = period.getStartTime();
         LocalTime endTime = period.getEndTime();
-        
-        // Ensure we have a list for this date
+
         if (!availableTimesByDate.containsKey(date)) {
             availableTimesByDate.put(date, new ArrayList<>());
         }
@@ -164,8 +155,7 @@ public class AppointmentService {
             LocalTime slotStart = currentTime;
             LocalTime slotEnd = currentTime.plusMinutes(30);
             
-            // Check if this slot overlaps with any existing appointment
-            boolean overlapsWithExistingAppointment = existingAppointments.stream()
+            boolean isDentistHavingAppointment = existingAppointments.stream()
                     .anyMatch(appointment -> {
                         LocalTime appointmentStart = appointment.getAppointmentTime().toLocalTime();
                         LocalTime appointmentEnd = appointment.getAppointmentEndTime().toLocalTime();
@@ -175,8 +165,7 @@ public class AppointmentService {
                                 slotEnd.equals(appointmentStart) || slotStart.equals(appointmentEnd));
                     });
             
-            // If no overlap and we haven't already added this time, add it to the list
-            if (!overlapsWithExistingAppointment && !availableTimesByDate.get(date).contains(slotStart)) {
+            if (!isDentistHavingAppointment && !availableTimesByDate.get(date).contains(slotStart)) {
                 availableTimesByDate.get(date).add(slotStart);
             }
             
