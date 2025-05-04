@@ -21,7 +21,7 @@
       </div>
       
       <div class="appointments-container">
-        <div class="current-time-line" :style="currentTimeStyle"></div>
+        <div v-if="selectedDate < tommorrow" class="current-time-line" :style="currentTimeStyle"></div>
         
         <div v-if="schedules.length === 0" class="no-appointments">
           <el-empty description="No appointments found" />
@@ -59,6 +59,8 @@ import { offsetDate } from '@/helper'
 
 const authStore = useAuthStore()
 
+const tommorrow = new Date()
+tommorrow.setDate(tommorrow.getDate() + 1)
 const selectedDate = ref(new Date())
 const username = computed(() => authStore.user)
 const appointments = ref([] as Appointment[])
