@@ -104,6 +104,7 @@ dentalclinic/
 - Automatic assignment to available dentist
 - Real-time availability checking
 - Disabled slots for unavailable times/dates
+   - Patients can only book 1 day in advanced 
 
 ### For Dentists
 - Login system
