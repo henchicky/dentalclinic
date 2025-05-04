@@ -15,7 +15,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     List<Appointment> findByDentistId(Long dentistId);
 
-    // Find appointments that overlap with the given time range
     @Query("SELECT a FROM Appointment a WHERE a.dentist.id = :dentistId AND " +
             // Case 1: Appointment starts before or at the requested start time and ends after or at the requested start time
             "(a.appointmentTime <= :startTime AND a.appointmentEndTime > :startTime) OR " +

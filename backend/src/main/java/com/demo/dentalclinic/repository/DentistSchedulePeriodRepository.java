@@ -10,6 +10,5 @@ import java.util.List;
 
 @Repository
 public interface DentistSchedulePeriodRepository extends JpaRepository<DentistSchedulePeriod, Long> {
-    List<DentistSchedulePeriod> findByDentistIdAndDate(Long dentistId, LocalDate date);
     List<DentistSchedulePeriod> findByDentistIdAndDateAndType(Long dentistId, LocalDate date, AvailabilityType type);
 } 

@@ -29,11 +29,6 @@ public class AppointmentTypeService {
         return appointmentTypeRepository.findById(id);
     }
 
-    @Cacheable(value = "appointmentTypes", key = "#name")
-    public Optional<AppointmentType> getAppointmentTypeByName(String name) {
-        return appointmentTypeRepository.findByName(name);
-    }
-
     @CacheEvict(value = "appointmentTypes", allEntries = true)
     public AppointmentType createAppointmentType(AppointmentType appointmentType) {
         if (appointmentTypeRepository.findByName(appointmentType.getName()).isPresent()) {

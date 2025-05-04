@@ -88,10 +88,6 @@ public class AppointmentService {
             return overlappingAppointments.isEmpty();
         });
     }
-
-    public List<Appointment> getDentistAppointments(Long dentistId) {
-        return appointmentRepository.findByDentistId(dentistId);
-    }
     
     public List<AvailableTimeSlotDTO> findAllAvailableTimeSlots() {
         // Map to store available timings by date
@@ -101,20 +97,15 @@ public class AppointmentService {
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = startDate.plusDays(30);
         
-        // Get all dentists
         List<Dentist> dentists = dentistRepository.findAll();
         
         // For each date in the range
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-            // For use in lambda
-
-            // For each dentist
             for (Dentist dentist : dentists) {
                 // Get all available periods for the dentist on the current date
                 List<DentistSchedulePeriod> availablePeriods = dentistScheduleService.getAvailablePeriods(
                         dentist.getId(), date);
                 
-                // Skip if no available periods
                 if (availablePeriods.isEmpty()) {
                     continue;
                 }
@@ -164,11 +155,8 @@ public class AppointmentService {
             DentistSchedulePeriod period,
             List<Appointment> existingAppointments,
             java.util.Map<LocalDate, List<LocalTime>> availableTimesByDate) {
-        
-        // Start time of the period
+
         LocalTime currentTime = period.getStartTime();
-        
-        // End time of the period
         LocalTime endTime = period.getEndTime();
         
         // Ensure we have a list for this date

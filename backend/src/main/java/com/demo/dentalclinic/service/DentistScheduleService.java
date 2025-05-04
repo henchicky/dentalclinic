@@ -35,12 +35,10 @@ public class DentistScheduleService {
     }
 
     public DentistSchedulePeriod createSchedulePeriod(DentistScheduleRequest request) {
-        // Validate time range
         if (request.getStartTime().isAfter(request.getEndTime())) {
             throw new IllegalArgumentException("Start time must be before end time");
         }
 
-        // Convert DentistScheduleRequest to DentistSchedulePeriod before saving
         DentistSchedulePeriod newPeriod = new DentistSchedulePeriod();
         newPeriod.setDentist(dentistRepository.getDentistsById(request.getDentistId()));
         newPeriod.setStartTime(request.getStartTime().toLocalTime());
