@@ -1,20 +1,16 @@
-package com.demo.dentalclinic.config;
+package com.demo.dentalclinic.seed;
 
 import com.demo.dentalclinic.dto.AppointmentRequest;
-import com.demo.dentalclinic.dto.AppointmentRequest;
-import com.demo.dentalclinic.enums.AppointmentStatus;
 import com.demo.dentalclinic.enums.AvailabilityType;
 import com.demo.dentalclinic.model.Appointment;
 import com.demo.dentalclinic.model.AppointmentType;
 import com.demo.dentalclinic.model.Dentist;
 import com.demo.dentalclinic.model.DentistSchedulePeriod;
 import com.demo.dentalclinic.model.Patient;
-import com.demo.dentalclinic.repository.AppointmentRepository;
 import com.demo.dentalclinic.repository.AppointmentTypeRepository;
 import com.demo.dentalclinic.repository.DentistRepository;
 import com.demo.dentalclinic.repository.DentistSchedulePeriodRepository;
 import com.demo.dentalclinic.repository.PatientRepository;
-import com.demo.dentalclinic.service.AppointmentService;
 import com.demo.dentalclinic.service.AppointmentService;
 import com.demo.dentalclinic.service.AppointmentTypeService;
 import org.springframework.boot.CommandLineRunner;
@@ -58,20 +54,18 @@ public class DataSeeder {
     private void seedAppointments(AppointmentTypeService appointmentTypeService, AppointmentService appointmentService, PatientRepository patientRepository, DentistRepository dentistRepository) {
         List<AppointmentType> appointmentTypes = appointmentTypeService.getAllAppointmentTypes();
         List<Patient> patients = patientRepository.findAll();
-        
+
         if (appointmentTypes.isEmpty() || patients.isEmpty()) {
             System.out.println("Cannot seed appointments: No appointment types or patients found");
             return;
         }
-        
+
         LocalDateTime startDateTime = LocalDateTime.now().withHour(8).withMinute(0).withSecond(0).withNano(0);
 
         LocalDateTime currentDateTime = startDateTime;
         int dayCounter = 0;
 
-        int dentistCount = dentistRepository.findAll().size();
-        // Create 15 sample appointments for each dentist
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 30; i++) {
             Patient patient = patients.get(i % patients.size());
             AppointmentType appointmentType = appointmentTypes.get(i % appointmentTypes.size());
 
@@ -94,14 +88,14 @@ public class DataSeeder {
 
                     appointmentCreated = true;
                     System.out.println("Created appointment at " + request.getAppointmentTime() + " for " + patient.getName() + " - " + appointmentType.getName());
-                    
+
                     // Move to the next time slot based on appointment duration
                     currentDateTime = request.getAppointmentTime().plusMinutes(appointmentType.getDurationMinutes());
                 } catch (Exception e) {
                     // If there's an error (like no dentist available), move the time forward by 15 mins
                     LocalDateTime failedTime = request.getAppointmentTime();
                     LocalDateTime newTime = failedTime.plusMinutes(15);
-                    
+
                     System.out.println("Failed to create appointment at " + failedTime + ": " + e.getMessage());
                     System.out.println("Retrying at " + newTime);
 
@@ -110,9 +104,8 @@ public class DataSeeder {
                         newTime = startDateTime.plusDays(dayCounter).withHour(9).withMinute(0);
                         System.out.println("Moving to next day: " + newTime);
                     }
-                    
+
                     request.setAppointmentTime(newTime);
-                    currentDateTime = newTime;
                 }
             }
         }
@@ -185,7 +178,7 @@ public class DataSeeder {
         LocalDate startDate = LocalDate.now();
 
         for (Dentist dentist : dentists) {
-            for (int day = 0; day < 14; day++) {
+            for (int day = 0; day < 7; day++) {
                 LocalDate currentDate = startDate.plusDays(day);
 
                 // Morning availability (9:00 AM - 12:00 PM)
@@ -234,8 +227,7 @@ public class DataSeeder {
                             AvailabilityType.AVAILABLE,
                             "Afternoon shift"
                     ));
-                }
-                else {
+                } else {
                     // Afternoon availability (1:00 PM - 5:00 PM)
                     schedulePeriods.add(createSchedulePeriod(
                             dentist,

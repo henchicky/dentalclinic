@@ -122,6 +122,7 @@ public class AppointmentService {
         
         List<AvailableTimeSlotDTO> result = new ArrayList<>();
         for (Map.Entry<LocalDate, List<LocalTime>> entry : availableTimesByDate.entrySet()) {
+            Collections.sort(entry.getValue());
             if(!entry.getValue().isEmpty()){
                 result.add(new AvailableTimeSlotDTO(
                         entry.getKey(),
