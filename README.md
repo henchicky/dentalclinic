@@ -2,6 +2,8 @@
 
 A full-stack application for managing dental clinic appointments, built with Spring Boot and Vue.js.
 
+Demo vid: https://drive.google.com/file/d/1-4yYvhsSO3SC0OsSwx3NOiFYtQXYsPLb/view?usp=sharing
+
 ## Overview
 
 This application allows:
